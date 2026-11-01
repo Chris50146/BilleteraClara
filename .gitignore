@@ -1,0 +1,6 @@
+target/
+.bsp/
+.scala-build/
+.metals/
+.idea/
+*.class
