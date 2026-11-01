@@ -55,26 +55,26 @@ case class Usuario(id: String, nombre: String)
 case class Transaccion(
     id: String,
     descripcion: String,
-    monto: BigDecimal,
+    monto: Double,
     fecha: LocalDate,
     categoria: Categoria,
     tipo: TipoTransaccion
 ):
   // Un movimiento determina su propio efecto en el saldo.
-  def montoConSigno: BigDecimal = tipo match
+  def montoConSigno: Double = tipo match
     case Ingreso => monto
     case Gasto   => -monto
 
 case class Diagnostico(
     estado: EstadoDiagnostico,
-    gastoOcio: BigDecimal,
-    totalGastos: BigDecimal,
-    porcentajeOcio: BigDecimal
+    gastoOcio: Double,
+    totalGastos: Double,
+    porcentajeOcio: Double
 )
 
 case class Simulacion(
-    saldoActual: BigDecimal,
-    saldoProyectado: BigDecimal,
+    saldoActual: Double,
+    saldoProyectado: Double,
     diagnosticoActual: Diagnostico,
     diagnosticoProyectado: Diagnostico,
     compraPosible: Boolean

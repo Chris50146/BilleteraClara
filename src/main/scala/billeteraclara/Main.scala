@@ -59,8 +59,8 @@ private object Estilo:
       BorderFactory.createLineBorder(borde, 1, true), new EmptyBorder(10, 12, 10, 12)))
     campo
 
-  def dinero(valor: BigDecimal): String =
-    "Bs " + valor.setScale(2, BigDecimal.RoundingMode.HALF_UP).toString
+  def dinero(valor: Double): String =
+    f"Bs $valor%.2f"
 
 private class Tarjeta(color: Color = Estilo.blanco, radio: Int = 22) extends JPanel:
   setOpaque(false)
@@ -377,40 +377,34 @@ private class VentanaBilletera extends JFrame("Billetera Clara"):
     )
     simCategoria.setRenderer(categoria.getRenderer)
 
-  private def parsearMonto(texto: String): Either[String, BigDecimal] =
-    Try(BigDecimal(texto.trim.replace(',', '.'))).toOption match
+  private def parsearMonto(texto: String): Either[String, Double] =
+    Try(texto.trim.replace(',', '.').toDouble).toOption match
       case None => Left("Introduce un monto numérico válido.")
-      case Some(valor) if valor <= 0 => Left("El monto debe ser mayor a cero.")
-      case Some(valor) if valor.scale > 2 => Left("Usa como máximo dos decimales.")
+      case Some(valor) if valor.isNaN || valor.isInfinity || valor <= 0 =>
+        Left("El monto debe ser mayor a cero.")
       case Some(valor) => Right(valor)
 
   private def registrarMovimiento(): Unit =
-    val resultado = for
-      valor <- parsearMonto(monto.getText)
-      nueva <- actual.registrar(Transaccion(
-        UUID.randomUUID().toString,
-        descripcion.getText.trim,
-        valor,
-        LocalDate.now(),
-        categoria.getSelectedItem.asInstanceOf[Categoria],
-        if tipo.getSelectedItem == "Ingreso" then Ingreso else Gasto
-      ))
-    yield nueva
-
-    resultado match
+    parsearMonto(monto.getText) match
       case Left(error) => mostrarError(error)
-      case Right(nueva) =>
-        actual = nueva
+      case Right(valor) if descripcion.getText.trim.isEmpty =>
+        mostrarError("Escribe una descripción.")
+      case Right(valor) =>
+        val transaccion = Transaccion(
+          UUID.randomUUID().toString, descripcion.getText.trim, valor, LocalDate.now(),
+          categoria.getSelectedItem.asInstanceOf[Categoria],
+          if tipo.getSelectedItem == "Ingreso" then Ingreso else Gasto
+        )
+        actual = actual.registrar(transaccion)
         descripcion.setText("")
         monto.setText("")
         actualizarTodo()
 
   private def simularCompra(): Unit =
-    val resultado = parsearMonto(simMonto.getText).flatMap(valor =>
-      actual.simularCompra(valor, simCategoria.getSelectedItem.asInstanceOf[Categoria]))
-    resultado match
+    parsearMonto(simMonto.getText) match
       case Left(error) => mostrarError(error)
-      case Right(s) =>
+      case Right(valor) =>
+        val s = actual.simularCompra(valor, simCategoria.getSelectedItem.asInstanceOf[Categoria])
         resultadoSimulacion.removeAll()
         resultadoSimulacion.add(etiqueta("Saldo proyectado", 12, tenue))
         resultadoSimulacion.add(Box.createVerticalStrut(4))
@@ -435,7 +429,7 @@ private class VentanaBilletera extends JFrame("Billetera Clara"):
     diagnosticoValor.setText(if d.estado == Saludable then "●  Presupuesto saludable" else "●  Atención al ocio")
     diagnosticoValor.setForeground(if d.estado == Saludable then verde else rojo)
     ocioValor.setText(f"Ocio: ${d.porcentajeOcio.toDouble}%.1f%% del gasto · ${dinero(d.gastoOcio)}")
-    barraOcio.setValue(d.porcentajeOcio.min(BigDecimal(100)).toInt)
+    barraOcio.setValue(d.porcentajeOcio.min(100.0).toInt)
     barraOcio.setForeground(if d.estado == Saludable then acento else rojo)
     actualizarLista()
     actualizarGrafico()
@@ -505,7 +499,7 @@ private class VentanaBilletera extends JFrame("Billetera Clara"):
 
   private def actualizarGrafico(): Unit =
     categoriasGrafico.removeAll()
-    val datos = actual.categoriasActivas.sortBy(par => -par._2)
+    val datos = actual.totalesPorCategoria.filter(_._2 > 0).sortBy(par => -par._2)
     if datos.isEmpty then
       categoriasGrafico.add(etiqueta("Registra un gasto para ver la distribución.", 12, tenue))
     else
