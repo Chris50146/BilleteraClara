@@ -49,3 +49,11 @@ El botón **Empezar en blanco** quita los movimientos de la sesión. Los datos p
 [Descripción completa, decisiones de diseño, relación con el curso y ejemplos de ejecución](docs/ProyectoFinal.md).
 
 El modelo se encuentra en `Modelo.scala` y `Billetera.scala`; `DatosDemo.scala` genera un ejemplo fijo. Swing y la adaptación de texto, fechas del sistema y formato visual se encuentran en `Main.scala` y `EntradaInterfaz.scala`.
+
+## Continuar desde el celular
+
+El repositorio de trabajo es [Chris50146/BilleteraClara](https://github.com/Chris50146/BilleteraClara). Las instrucciones para Codex se conservan en [AGENTS.md](AGENTS.md) y el material del curso en [referencias](referencias/README.md).
+
+Para trabajar con la laptop apagada, usa un entorno publicado de Codex Cloud conectado a este repositorio. La documentación oficial explica cómo [crear el entorno y acceder desde móvil](https://learn.chatgpt.com/docs/cloud). Una conexión remota al equipo local requiere que ese equipo siga disponible.
+
+La verificación del modelo no abre ventanas. La interfaz Swing es una aplicación de escritorio y necesita un entorno gráfico para una revisión visual.
