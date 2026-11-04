@@ -4,7 +4,7 @@ Proyecto final de Programación Funcional en Scala 3, de Israel Vargas y Christi
 
 ## Ejecutar
 
-Requiere Java 17 o superior y Scala CLI. Desde la raíz del repositorio:
+Requiere Java 17 o superior y Scala CLI. Para abrir Swing, Java debe incluir soporte gráfico (no solo `headless`) y debe haber una pantalla activa. Desde la raíz del repositorio:
 
 ```bash
 scala run src/main/scala --server=false --jvm system --main-class billeteraclara.Main
@@ -12,7 +12,7 @@ scala run src/main/scala --server=false --jvm system --main-class billeteraclara
 
 También se puede usar `sbt run`. La primera ejecución puede descargar Scala y las herramientas de compilación; luego utiliza la caché local. `--jvm system` usa el Java instalado.
 
-Para usar el paquete de entrega, descarga [BilleteraClara-Publicar.zip](BilleteraClara-Publicar.zip), descomprímelo y ejecuta el mismo comando desde la carpeta `BilleteraClara-Publicar`.
+Para usar el paquete de entrega, descarga [BilleteraClara-Publicar.zip](https://github.com/Chris50146/BilleteraClara/blob/main/BilleteraClara-Publicar.zip), descomprímelo y ejecuta el mismo comando desde la carpeta `BilleteraClara-Publicar`.
 
 ## Verificar
 
@@ -29,6 +29,10 @@ Todas las comprobaciones del modelo y del adaptador de interfaz pasaron.
 ```
 
 Las comprobaciones cubren inmutabilidad, saldo exacto en centavos, umbral de ocio, simulaciones, búsquedas, eliminación, validaciones del modelo, fechas, límites numéricos y conversión de entradas. No requieren librerías de pruebas externas.
+
+## Preparar la presentación
+
+Consulta la [guía de exposición](docs/Presentacion.md), con una demostración paso a paso, resultados esperados y correspondencia con los requisitos obligatorios. El documento principal de entrega es [docs/ProyectoFinal.md](docs/ProyectoFinal.md).
 
 ## Uso y ejemplo inicial
 

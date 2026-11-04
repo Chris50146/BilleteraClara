@@ -118,6 +118,23 @@ object Verificacion:
     comprobar(!Fecha(1, 1, 0).esValida && !Fecha(1, 1, 10000).esValida, "Años fuera de rango")
     comprobar(Fecha(31, 12, 9999).esValida, "Fecha máxima")
 
+    // Casos de presentación: tipos compatibles y saldo negativo permitido.
+    val ingresoOtros = obtener(vacia.registrar(sueldo.copy(categoria = Otros)))
+    comprobar(ingresoOtros.ingresos == 10000L, "Otros también es una categoría de ingreso")
+    val gastoSinFondos = obtener(vacia.registrar(comida))
+    comprobar(gastoSinFondos.saldo == -8000L, "Registrar gastos no exige saldo previo")
+    comprobar(!obtener(gastoSinFondos.simularCompra(1L, Otros)).compraPosible,
+      "La simulación informa el déficit de una billetera con saldo negativo")
+    comprobar(esError(vacia.registrar(sueldo.copy(id = ""))), "Rechazar identificador sin caracteres")
+    comprobar(esError(vacia.registrar(sueldo.copy(descripcion = "\t\n\r "))),
+      "Rechazar descripción formada por espacios y saltos de línea")
+    comprobar(obtener(limite.eliminar("1").registrar(comida)).gastos == 8000L,
+      "Después de eliminar se puede volver a utilizar el margen liberado")
+    comprobar(Fecha(30, 4, 2026).esValida && !Fecha(31, 4, 2026).esValida,
+      "Abril termina el día 30")
+    comprobar(Fecha(28, 2, 1900).esValida && Fecha(1, 1, 1).esValida,
+      "Aceptar el fin de febrero no bisiesto y el año mínimo")
+
     // El adaptador de la interfaz también se comprueba sin abrir una ventana.
     comprobar(obtener(EntradaInterfaz.parsearMonto("0.30")) == 30L, "Convertir decimales exactos")
     comprobar(obtener(EntradaInterfaz.parsearMonto(" 25,50 ")) == 2550L, "Aceptar coma decimal y espacios externos")
@@ -132,5 +149,7 @@ object Verificacion:
     val demo = obtener(DatosDemo.ejemplo)
     comprobar(demo.ingresos == 315000L && demo.gastos == 56730L && demo.saldo == 258270L,
       "Los datos de demostración deben coincidir con la documentación")
+    comprobar(demo.diagnostico.gastoOcio == 4500L && demo.diagnostico.totalGastos == 56730L,
+      "La auditoría de demostración usa exactamente los importes documentados")
     comprobar(demo.transacciones.length == 6 && demo.diagnostico.estado == Saludable, "Ejemplo reproducible")
     println("Todas las comprobaciones del modelo y del adaptador de interfaz pasaron.")

@@ -237,7 +237,12 @@ private class VentanaBilletera extends JFrame("Billetera Clara"):
     controles.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44))
     busqueda.setToolTipText("Buscar por descripción o categoría")
     busqueda.putClientProperty("JTextField.placeholderText", "Buscar movimiento...")
-    controles.add(busqueda)
+    busqueda.getAccessibleContext.setAccessibleName("Buscar por descripción o categoría")
+    val buscarPanel = new JPanel(new BorderLayout(6, 0))
+    buscarPanel.setOpaque(false)
+    buscarPanel.add(etiqueta("Buscar", 12, tenue), BorderLayout.WEST)
+    buscarPanel.add(busqueda, BorderLayout.CENTER)
+    controles.add(buscarPanel)
     decorarCombo(filtroTipo)
     controles.add(filtroTipo)
     cuerpo.add(controles)
@@ -357,7 +362,7 @@ private class VentanaBilletera extends JFrame("Billetera Clara"):
     combo.setFont(fuente(13))
     combo.setForeground(tinta)
     combo.setBackground(blanco)
-    combo.setFocusable(false)
+    combo.setFocusable(true)
 
   private def prepararEventos(): Unit =
     tipo.addActionListener((_: ActionEvent) => actualizarCategorias())
@@ -455,7 +460,8 @@ private class VentanaBilletera extends JFrame("Billetera Clara"):
         (tipoElegido == "Ingresos" && tx.tipo == Ingreso) ||
         (tipoElegido == "Gastos" && tx.tipo == Gasto))
     )
-    cantidadLabel.setText(s"${encontrados.length} registros")
+    cantidadLabel.setText(s"${encontrados.length} " +
+      (if encontrados.length == 1 then "registro" else "registros"))
     lista.removeAll()
     if encontrados.isEmpty then
       val vacio = etiqueta("Sin movimientos para este filtro.", 13, tenue)

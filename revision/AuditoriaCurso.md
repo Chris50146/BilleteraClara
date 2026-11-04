@@ -116,9 +116,23 @@ SHA-256 del ZIP del curso: `81468fca26bed498d103ea2d2de1aaaed78283869df3820369c0
 
 | Fuente del proyecto | SHA-256 |
 | --- | --- |
-| `src/main/scala/billeteraclara/Billetera.scala` | `ba58220f694e86e3143c2493553c0bda22c7ef5b7572b1322af22af5bcd7fe54` |
-| `src/main/scala/billeteraclara/DatosDemo.scala` | `1e4a47099f1c05d4e5b88e7ae481fd23fb62cf3487d4db8a70a483bb3789db82` |
-| `src/main/scala/billeteraclara/EntradaInterfaz.scala` | `db2df45c5b9f08a84e4f5d6e776ee22cdedbaf416b8686cd0cbcabf0defdaca5` |
-| `src/main/scala/billeteraclara/Main.scala` | `54d5e7acdfd0c1498fe19cf0f015ffd1b5b29503bdb9da0c30b3233e3d6b371a` |
-| `src/main/scala/billeteraclara/Modelo.scala` | `c7f52608f3d5f11d5c23c37bc65c38c6f714b28379cb05ea9e778597b3f68e27` |
-| `src/test/scala/billeteraclara/Verificacion.scala` | `39d4abf62e48c04b3405781fc6f88ef2227ae9947f16fdb2cdeb1ff7349d851a` |
+| `src/main/scala/billeteraclara/Billetera.scala` | `dac50761f910abfc70cfc15392fe072f6a718e1fff2aaf0b795c76d6590b765c` |
+| `src/main/scala/billeteraclara/DatosDemo.scala` | `e8dd7f5418f681bdbc7e3403e0672e886958b2896f02876459731338e0c11bee` |
+| `src/main/scala/billeteraclara/EntradaInterfaz.scala` | `ec8e7e3b2ba02208bc2a3389105900c13ee0acad9851fad29e293bac3fd8d29f` |
+| `src/main/scala/billeteraclara/Main.scala` | `36e05bedbf687e94b68aa8b40990cfa63fb75e52bb6918aff7ef3ea9373ab4ce` |
+| `src/main/scala/billeteraclara/Modelo.scala` | `d1ad84a5df337bbf17eeef3792c15c0c1d417b8c2ba2da857d2f4a787663de98` |
+| `src/test/scala/billeteraclara/Verificacion.scala` | `065e079fbe084cb9c22fe9980776b7b5083a9e2daaf0e20839d59468675885ce` |
+
+## Revisión final para presentación (4 de noviembre de 2026)
+
+Se volvieron a contrastar el enunciado, el ZIP del curso y la propuesta PDF adjuntos con las referencias guardadas: coinciden (normalizando finales de línea en el Markdown). No fue necesario cambiar el modelo, sus reglas ni sus dependencias. Las nuevas comprobaciones usan únicamente construcciones ya respaldadas en esta auditoría.
+
+Se añadió una etiqueta visible y un nombre accesible al buscador, se habilitó el foco de teclado en los selectores y se corrigió el contador singular. Se agregó `docs/Presentacion.md` con un guion de exposición y trazabilidad a los requisitos obligatorios. README y documento del sistema explican el requisito de Java gráfico.
+
+La compilación y las comprobaciones ampliadas del modelo y del adaptador pasaron con Java 21 y Scala CLI 1.18.0 / Scala 3.9.0. El Java del entorno era solo headless; para verificar Swing se preparó temporalmente Java gráfico 21.0.13 y un servidor X virtual. Se observó la ventana inicial y se probaron las acciones de la interfaz mediante un auxiliar temporal sobre los componentes Swing: búsqueda, filtro, registro, simulación sin registro, eliminación y sesión vacía. Esta evidencia corresponde a Linux; no constituye una comprobación del aspecto nativo en Windows ni macOS.
+
+Las vías verificadas usan Scala CLI. La alternativa sbt del README no se ejecutó en esta revisión. No se publicaron cambios en GitHub ni se modificó la configuración publicada del entorno.
+
+El auxiliar temporal de interfaz también confirmó la compra con saldo proyectado exactamente cero, el rechazo de un registro con monto cero sin alterar el estado visible y la independencia entre saldo suficiente y alerta de ocio. El auxiliar se mantuvo fuera de los fuentes de entrega.
+
+El paquete final contiene 12 archivos y coincide byte a byte con sus archivos del checkout. Desde una extracción independiente se ejecutaron de nuevo la compilación y todas las comprobaciones, ambas con resultado correcto. Se revisaron los enlaces locales de README y documentos de entrega, así como `git diff --check`, sin errores. Los hashes de este anexo corresponden a los archivos actuales (con finales de línea LF).

@@ -96,7 +96,7 @@ No se requiere utilizar todas las operaciones citadas en el enunciado: se aplica
 
 ## 7. Interfaz gráfica asociada
 
-Se utiliza `javax.swing`, la alternativa de JVM contemplada en la propuesta. La interfaz muestra saldo, ingresos, gastos, movimientos, distribución por categoría, auditoría y simulación. Los botones invocan el modelo y procesan `Exito` o `Error` mediante `match`.
+Se utiliza `javax.swing`, la alternativa de JVM contemplada en la propuesta. La interfaz muestra saldo, ingresos, gastos, movimientos, distribución por categoría, auditoría y simulación. El buscador tiene una etiqueta visible y los selectores permiten navegación con teclado. Los botones invocan el modelo y procesan `Exito` o `Error` mediante `match`.
 
 `Main.scala` contiene Swing, formato visual, eventos, fecha del sistema e identificadores. Su única variable de estado propia es `actual`, que referencia la versión vigente de la billetera. Los objetos del dominio y sus listas siguen siendo inmutables.
 
@@ -143,7 +143,7 @@ inicial.registrar(ingreso) match
 
 ## 9. Ejecución y comprobaciones
 
-Desde la raíz, con Java 17 o superior y Scala CLI:
+Desde la raíz, con Java 17 o superior y Scala CLI. Para Swing se necesita Java con soporte gráfico y una pantalla activa; una instalación solo headless permite ejecutar las comprobaciones, pero no abrir la ventana:
 
 ```bash
 scala run src/main/scala --server=false --jvm system --main-class billeteraclara.Main
@@ -160,5 +160,6 @@ La primera ejecución puede descargar las herramientas de compilación. Las comp
 - Comprobaciones ejecutables en `src/test/scala`.
 - Este documento, con dominio, modelo, funcionalidades, interfaz, decisiones y ejemplos.
 - README con instrucciones de ejecución y uso.
+- `docs/Presentacion.md`: guía de demostración y correspondencia con los requisitos obligatorios.
 - Configuración `build.sbt` y `project/build.properties` (infraestructura de compilación, separada del contenido del modelo).
 - Paquete `BilleteraClara-Publicar.zip` con los mismos fuentes y documentos, sin cachés ni archivos compilados.
