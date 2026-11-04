@@ -3,4 +3,8 @@ target/
 .scala-build/
 .metals/
 .idea/
+.bloop/
+.vscode/
+/project/metals.sbt
+/project/project/
 *.class

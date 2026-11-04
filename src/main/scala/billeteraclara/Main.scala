@@ -9,7 +9,6 @@ import java.util.UUID
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 import javax.swing.event.{DocumentEvent, DocumentListener}
-import scala.util.Try
 
 object Main:
   def main(args: Array[String]): Unit =
@@ -41,6 +40,8 @@ private object Estilo:
 
   def boton(texto: String, principal: Boolean = false): JButton =
     val boton = new JButton(texto)
+    // La UI básica respeta los colores también con el tema nativo de Windows.
+    boton.setUI(new javax.swing.plaf.basic.BasicButtonUI())
     boton.setFont(fuente(13, true))
     boton.setFocusPainted(false)
     boton.setBorder(new EmptyBorder(11, 16, 11, 16))
@@ -59,8 +60,10 @@ private object Estilo:
       BorderFactory.createLineBorder(borde, 1, true), new EmptyBorder(10, 12, 10, 12)))
     campo
 
-  def dinero(valor: Double): String =
-    f"Bs $valor%.2f"
+  def dinero(valor: Long): String =
+    val absoluto = math.abs(valor)
+    val signo = if valor < 0 then "-" else ""
+    f"Bs $signo${absoluto / 100}%d.${absoluto % 100}%02d"
 
 private class Tarjeta(color: Color = Estilo.blanco, radio: Int = 22) extends JPanel:
   setOpaque(false)
@@ -77,7 +80,9 @@ private class VentanaBilletera extends JFrame("Billetera Clara"):
   import Estilo.*
 
   // La única variable de estado está en la interfaz. El modelo devuelve nuevas Billeteras.
-  private var actual: Billetera = DatosDemo.ejemplo
+  private var actual: Billetera = DatosDemo.ejemplo match
+    case Exito(billetera) => billetera
+    case Error(mensaje) => throw new IllegalStateException(mensaje)
 
   private val saldoValor = etiqueta("", 31, tinta, true)
   private val ingresosValor = etiqueta("", 23, verde, true)
@@ -222,12 +227,14 @@ private class VentanaBilletera extends JFrame("Billetera Clara"):
     cuerpo.setLayout(new BoxLayout(cuerpo, BoxLayout.Y_AXIS))
     val cabecera = new JPanel(new BorderLayout())
     cabecera.setOpaque(false)
+    cabecera.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28))
     cabecera.add(etiqueta("Movimientos", 20, tinta, true), BorderLayout.WEST)
     cabecera.add(cantidadLabel, BorderLayout.EAST)
     cuerpo.add(cabecera)
     cuerpo.add(Box.createVerticalStrut(18))
     val controles = new JPanel(new GridLayout(1, 2, 10, 0))
     controles.setOpaque(false)
+    controles.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44))
     busqueda.setToolTipText("Buscar por descripción o categoría")
     busqueda.putClientProperty("JTextField.placeholderText", "Buscar movimiento...")
     controles.add(busqueda)
@@ -265,7 +272,7 @@ private class VentanaBilletera extends JFrame("Billetera Clara"):
     interior.setLayout(new BoxLayout(interior, BoxLayout.Y_AXIS))
     interior.add(etiqueta("Nuevo movimiento", 18, tinta, true))
     interior.add(Box.createVerticalStrut(5))
-    interior.add(etiqueta("Cada registro crea una billetera nueva.", 12, tenue))
+    interior.add(etiqueta("Usa hasta dos decimales, por ejemplo: 25,50.", 12, tenue))
     interior.add(Box.createVerticalStrut(19))
     interior.add(campoConTitulo("TIPO", tipo))
     interior.add(Box.createVerticalStrut(12))
@@ -377,56 +384,56 @@ private class VentanaBilletera extends JFrame("Billetera Clara"):
     )
     simCategoria.setRenderer(categoria.getRenderer)
 
-  private def parsearMonto(texto: String): Either[String, Double] =
-    Try(texto.trim.replace(',', '.').toDouble).toOption match
-      case None => Left("Introduce un monto numérico válido.")
-      case Some(valor) if valor.isNaN || valor.isInfinity || valor <= 0 =>
-        Left("El monto debe ser mayor a cero.")
-      case Some(valor) => Right(valor)
-
   private def registrarMovimiento(): Unit =
-    parsearMonto(monto.getText) match
-      case Left(error) => mostrarError(error)
-      case Right(valor) if descripcion.getText.trim.isEmpty =>
-        mostrarError("Escribe una descripción.")
-      case Right(valor) =>
+    EntradaInterfaz.parsearMonto(monto.getText) match
+      case Error(error) => mostrarError(error)
+      case Exito(valor) =>
+        val hoy = LocalDate.now()
         val transaccion = Transaccion(
-          UUID.randomUUID().toString, descripcion.getText.trim, valor, LocalDate.now(),
+          UUID.randomUUID().toString, descripcion.getText.trim, valor,
+          Fecha(hoy.getDayOfMonth, hoy.getMonthValue, hoy.getYear),
           categoria.getSelectedItem.asInstanceOf[Categoria],
           if tipo.getSelectedItem == "Ingreso" then Ingreso else Gasto
         )
-        actual = actual.registrar(transaccion)
-        descripcion.setText("")
-        monto.setText("")
-        actualizarTodo()
+        actual.registrar(transaccion) match
+          case Error(error) => mostrarError(error)
+          case Exito(nueva) =>
+            actual = nueva
+            descripcion.setText("")
+            monto.setText("")
+            actualizarTodo()
 
   private def simularCompra(): Unit =
-    parsearMonto(simMonto.getText) match
-      case Left(error) => mostrarError(error)
-      case Right(valor) =>
-        val s = actual.simularCompra(valor, simCategoria.getSelectedItem.asInstanceOf[Categoria])
-        resultadoSimulacion.removeAll()
-        resultadoSimulacion.add(etiqueta("Saldo proyectado", 12, tenue))
-        resultadoSimulacion.add(Box.createVerticalStrut(4))
-        resultadoSimulacion.add(etiqueta(dinero(s.saldoProyectado), 22,
-          if s.compraPosible then tinta else rojo, true))
-        resultadoSimulacion.add(Box.createVerticalStrut(6))
-        resultadoSimulacion.add(etiqueta(
-          if s.compraPosible then "Saldo suficiente" else "Saldo insuficiente", 12,
-          if s.compraPosible then verde else rojo, true))
-        resultadoSimulacion.add(Box.createVerticalStrut(3))
-        resultadoSimulacion.add(etiqueta(
-          f"Ocio proyectado: ${s.diagnosticoProyectado.porcentajeOcio.toDouble}%.1f%% · " +
-            s.diagnosticoProyectado.estado.nombre, 12, tenue))
-        resultadoSimulacion.revalidate()
-        resultadoSimulacion.repaint()
+    // No conservar una proyección anterior si el nuevo intento es inválido.
+    resultadoSimulacion.removeAll()
+    EntradaInterfaz.parsearMonto(simMonto.getText) match
+      case Error(error) => mostrarError(error)
+      case Exito(valor) =>
+        actual.simularCompra(valor, simCategoria.getSelectedItem.asInstanceOf[Categoria]) match
+          case Error(error) => mostrarError(error)
+          case Exito(s) =>
+            resultadoSimulacion.add(etiqueta("Saldo proyectado", 12, tenue))
+            resultadoSimulacion.add(Box.createVerticalStrut(4))
+            resultadoSimulacion.add(etiqueta(dinero(s.saldoProyectado), 22,
+              if s.compraPosible then tinta else rojo, true))
+            resultadoSimulacion.add(Box.createVerticalStrut(6))
+            resultadoSimulacion.add(etiqueta(
+              if s.compraPosible then "Saldo suficiente" else "Saldo insuficiente", 12,
+              if s.compraPosible then verde else rojo, true))
+            resultadoSimulacion.add(Box.createVerticalStrut(3))
+            resultadoSimulacion.add(etiqueta(
+              f"Ocio proyectado: ${s.diagnosticoProyectado.porcentajeOcio}%.1f%% · " +
+                s.diagnosticoProyectado.estado.nombre, 12, tenue))
+    resultadoSimulacion.revalidate()
+    resultadoSimulacion.repaint()
 
   private def actualizarTodo(): Unit =
     saldoValor.setText(dinero(actual.saldo))
     ingresosValor.setText(dinero(actual.ingresos))
     gastosValor.setText(dinero(actual.gastos))
     val d = actual.diagnostico
-    diagnosticoValor.setText(if d.estado == Saludable then "●  Presupuesto saludable" else "●  Atención al ocio")
+    diagnosticoValor.setText(if d.totalGastos == 0 then "●  Sin gastos para evaluar"
+      else if d.estado == Saludable then "●  Ocio dentro del 20%" else "●  Atención al ocio")
     diagnosticoValor.setForeground(if d.estado == Saludable then verde else rojo)
     ocioValor.setText(f"Ocio: ${d.porcentajeOcio.toDouble}%.1f%% del gasto · ${dinero(d.gastoOcio)}")
     barraOcio.setValue(d.porcentajeOcio.min(100.0).toInt)
@@ -478,13 +485,14 @@ private class VentanaBilletera extends JFrame("Billetera Clara"):
     datos.add(etiqueta(tx.descripcion, 13, tinta, true))
     datos.add(Box.createVerticalStrut(4))
     datos.add(etiqueta(tx.categoria.nombre + " · " +
-      tx.fecha.format(DateTimeFormatter.ofPattern("dd MMM yyyy", java.util.Locale.forLanguageTag("es"))),
+      LocalDate.of(tx.fecha.anio, tx.fecha.mes, tx.fecha.dia).format(
+        DateTimeFormatter.ofPattern("dd MMM yyyy", java.util.Locale.forLanguageTag("es"))),
       11, tenue))
     fila.add(datos, BorderLayout.CENTER)
 
     val acciones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 3))
     acciones.setOpaque(false)
-    acciones.add(etiqueta((if tx.tipo == Ingreso then "+" else "−") + dinero(tx.monto),
+    acciones.add(etiqueta((if tx.tipo == Ingreso then "+" else "−") + dinero(tx.montoCentavos),
       13, if tx.tipo == Ingreso then verde else tinta, true))
     val borrar = boton("×")
     borrar.setToolTipText("Eliminar movimiento")
