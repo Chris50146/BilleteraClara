@@ -116,12 +116,12 @@ SHA-256 del ZIP del curso: `81468fca26bed498d103ea2d2de1aaaed78283869df3820369c0
 
 | Fuente del proyecto | SHA-256 |
 | --- | --- |
-| `src/main/scala/billeteraclara/Billetera.scala` | `dac50761f910abfc70cfc15392fe072f6a718e1fff2aaf0b795c76d6590b765c` |
-| `src/main/scala/billeteraclara/DatosDemo.scala` | `e8dd7f5418f681bdbc7e3403e0672e886958b2896f02876459731338e0c11bee` |
-| `src/main/scala/billeteraclara/EntradaInterfaz.scala` | `ec8e7e3b2ba02208bc2a3389105900c13ee0acad9851fad29e293bac3fd8d29f` |
-| `src/main/scala/billeteraclara/Main.scala` | `334a97f702548cabfd598882251a93540d48e57b1665548eb7efa08ca57b3bba` |
-| `src/main/scala/billeteraclara/Modelo.scala` | `d1ad84a5df337bbf17eeef3792c15c0c1d417b8c2ba2da857d2f4a787663de98` |
-| `src/test/scala/billeteraclara/Verificacion.scala` | `1ab05f776e07c063c4b1c58a9bad92d2f38aba99ad2fe907daad84821c07da96` |
+| `src/main/scala/billeteraclara/Billetera.scala` | `9d2913c844ca42a8abc96a8d6284593dc75b57c4bf3b6e78a170897bbebe5c06` |
+| `src/main/scala/billeteraclara/DatosDemo.scala` | `495e1bbfde24fd44bc1f39618e81df26442e0321dcfdd2f5dd9a008f5b506388` |
+| `src/main/scala/billeteraclara/EntradaInterfaz.scala` | `c4d1ec2c09838ebc6b3d181a7d75b0ecce218fd3dd158be666d447b588f98b84` |
+| `src/main/scala/billeteraclara/Main.scala` | `67c697b260ed0b4a1137b8413207ac0b3c0d4abaae77036d49348d6d56ca04f9` |
+| `src/main/scala/billeteraclara/Modelo.scala` | `c06da4f20c812cdbad7443f78c335043b9e10f3f39ed798ba1f776056a7d4324` |
+| `src/test/scala/billeteraclara/Verificacion.scala` | `9913b51f2736de365c2c11b06f626037813fc26e2304c4c342f8b1bfddbf86c9` |
 
 ## Revisión final para presentación (4 de noviembre de 2026)
 
@@ -164,3 +164,7 @@ La ventana y la cabecera muestran YourWallet; el nombre del proyecto sbt es your
 La interfaz adopta superficies oscuras y verdes, cabecera compacta, mensajes directos y marcadores de categoría tipográficos. Se retiran emojis y el banner decorativo. Registrar y Simular se organizan en pestañas, con historial desplazable independiente, foco de teclado, colores consistentes de controles y animaciones basadas en tiempo. Se conservan confirmación de vaciado, filtros y su limpieza tras registro, entradas por teclado, modelo y centavos enteros. No se modifica la lógica financiera ni se introducen nuevas APIs fuera de interfaz. La documentación de entrega refleja el nuevo diseño.
 
 Validación: se revisó visualmente la ventana oscura en Linux con pantalla virtual. Pasaron las comprobaciones del modelo y adaptador, registros por todas las categorías, limpieza de filtros, búsqueda, eliminación, proyección sin registro, compra exacta y rechazo de entradas inválidas. Las pruebas de interfaz confirmaron cancelar/aceptar vaciado, accesos rápidos, registro y simulación con Enter, auditoría sin ocio y finalización y cierre de temporizadores. Se comprobó la integridad del ZIP y su coincidencia con los archivos vigentes; las comprobaciones se ejecutaron también desde una extracción independiente. El aspecto nativo en Windows/macOS no se probó.
+
+## Comentarios de estudio (5 de noviembre de 2026)
+
+Se añadieron comentarios en español a Modelo, Billetera, DatosDemo, EntradaInterfaz, Main y Verificacion para explicar responsabilidades, funciones, validaciones, inmutabilidad, recorridos, adaptación de entradas, eventos y bloques de pruebas. La comparación contra el commit anterior, excluyendo las líneas de comentario, confirmó que las líneas ejecutables son idénticas. Se actualizaron los hashes del anexo y el paquete de entrega.

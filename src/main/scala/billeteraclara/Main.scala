@@ -11,7 +11,9 @@ import javax.swing.*
 import javax.swing.border.EmptyBorder
 import javax.swing.event.{DocumentEvent, DocumentListener}
 
+// Punto de entrada de escritorio; prepara el tema y abre la ventana en el hilo de Swing.
 object Main:
+  // invokeLater concentra la creación de componentes en el hilo de eventos de la interfaz.
   def main(args: Array[String]): Unit =
     SwingUtilities.invokeLater(() =>
       UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName)
@@ -25,6 +27,7 @@ object Main:
       ventana.setVisible(true)
     )
 
+// Centraliza colores y componentes reutilizables; no contiene reglas financieras.
 private object Estilo:
   val fondo = new Color(13, 20, 20)
   val blanco = new Color(23, 31, 31) // Superficie de controles y tarjetas.
@@ -38,10 +41,12 @@ private object Estilo:
   val rojo = new Color(241, 148, 140)
   val rojoClaro = new Color(61, 39, 38)
 
+  // Selecciona una familia por plataforma y aplica tamaño y peso coherentes.
   def fuente(tamano: Int, negrita: Boolean = false): Font =
     val preferida = if System.getProperty("os.name").toLowerCase.contains("mac") then "Avenir Next" else "SansSerif"
     new Font(preferida, if negrita then Font.BOLD else Font.PLAIN, tamano)
 
+  // Crea texto de presentación con color, fuente y suavizado configurados.
   def etiqueta(texto: String, tamano: Int = 14, color: Color = tinta,
                negrita: Boolean = false): JLabel =
     val label = new JLabel(texto)
@@ -50,8 +55,10 @@ private object Estilo:
     label.setForeground(color)
     label
 
+  // Dibuja estados normal y hover; BasicButtonUI conserva colores entre plataformas.
   def boton(texto: String, principal: Boolean = false): JButton =
     val boton = new JButton(texto):
+      // Estado visual del cursor, separado del estado financiero.
       private var encima = false
       addMouseListener(new MouseAdapter:
         override def mouseEntered(e: MouseEvent): Unit =
@@ -61,6 +68,7 @@ private object Estilo:
           encima = false
           repaint()
       )
+      // Dibuja sobre una copia de Graphics y la libera para no alterar otros componentes.
       override def paintComponent(g: Graphics): Unit =
         val g2 = g.create().asInstanceOf[Graphics2D]
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
@@ -81,6 +89,7 @@ private object Estilo:
     boton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR))
     boton
 
+  // Prepara entrada de texto legible sobre el tema oscuro, incluido cursor y selección.
   def campo(): JTextField =
     val campo = new JTextField()
     campo.putClientProperty(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
@@ -94,31 +103,40 @@ private object Estilo:
       BorderFactory.createLineBorder(borde, 1, true), new EmptyBorder(10, 12, 10, 12)))
     campo
 
+  // Adapta la barra de desplazamiento al tema y oculta flechas que ocupan espacio.
   def decorarScroll(scroll: JScrollPane): Unit =
     scroll.getVerticalScrollBar.setPreferredSize(new Dimension(9, 0))
     scroll.getVerticalScrollBar.setUI(new javax.swing.plaf.basic.BasicScrollBarUI():
+      // Configura los colores del delegado visual; no altera el comportamiento de desplazamiento.
       override protected def configureScrollBarColors(): Unit =
         thumbColor = borde
         trackColor = fondo
+      // Devuelve un botón sin tamaño para el extremo inicial de la barra.
       override protected def createDecreaseButton(o: Int): JButton = ocultar()
+      // Aplica el mismo tratamiento al extremo final de la barra.
       override protected def createIncreaseButton(o: Int): JButton = ocultar()
+      // El botón sigue existiendo para Swing, pero no reserva espacio visible.
       private def ocultar(): JButton =
         val b = new JButton()
         b.setPreferredSize(new Dimension(0, 0))
         b
+      // Dibuja el indicador arrastrable en su posición calculada por Swing.
       override protected def paintThumb(g: Graphics, c: JComponent, r: Rectangle): Unit =
         g.setColor(tenue)
         g.fillRoundRect(r.x + 2, r.y, math.max(3, r.width - 4), r.height, 5, 5)
     )
 
+  // Presenta centavos con dos decimales y signo, sin convertir el dinero a Double.
   def dinero(valor: Long): String =
     val absoluto = math.abs(valor)
     val signo = if valor < 0 then "-" else ""
     f"Bs $signo${absoluto / 100}%d.${absoluto % 100}%02d"
 
+// Panel de presentación con superficie y borde redondeados.
 private class Tarjeta(color: Color = Estilo.blanco, radio: Int = 14) extends JPanel:
   setOpaque(false)
   setLayout(new BorderLayout())
+  // Dibuja sobre una copia de Graphics y la libera para no alterar otros componentes.
   override def paintComponent(g: Graphics): Unit =
     val g2 = g.create().asInstanceOf[Graphics2D]
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
@@ -129,8 +147,10 @@ private class Tarjeta(color: Color = Estilo.blanco, radio: Int = 14) extends JPa
     g2.dispose()
     super.paintComponent(g)
 
+// Dibuja la marca con Java2D; no necesita cargar imágenes externas.
 private class Logo extends JComponent:
   setPreferredSize(new Dimension(58, 58))
+  // Dibuja sobre una copia de Graphics y la libera para no alterar otros componentes.
   override def paintComponent(g: Graphics): Unit =
     val g2 = g.create().asInstanceOf[Graphics2D]
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
@@ -144,10 +164,12 @@ private class Logo extends JComponent:
     g2.fillOval(39, 31, 4, 4)
     g2.dispose()
 
+// Barra de porcentaje cuyo dibujo respeta el tema oscuro.
 private class BarraColor(color: Color) extends JProgressBar(0, 100):
   setOpaque(false)
   setBorderPainted(false)
   setForeground(color)
+  // Dibuja sobre una copia de Graphics y la libera para no alterar otros componentes.
   override def paintComponent(g: Graphics): Unit =
     val g2 = g.create().asInstanceOf[Graphics2D]
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
@@ -159,11 +181,13 @@ private class BarraColor(color: Color) extends JProgressBar(0, 100):
       g2.fillRoundRect(0, 0, ancho, getHeight, getHeight, getHeight)
     g2.dispose()
 
+// Marcador tipográfico de categoría; evita depender de fuentes de emojis.
 private class Burbuja(texto: String, fondo: Color) extends JLabel(texto, SwingConstants.CENTER):
   setOpaque(false)
   setFont(Estilo.fuente(14, true))
   setForeground(Estilo.tinta)
   setPreferredSize(new Dimension(38, 38))
+  // Dibuja sobre una copia de Graphics y la libera para no alterar otros componentes.
   override def paintComponent(g: Graphics): Unit =
     val g2 = g.create().asInstanceOf[Graphics2D]
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
@@ -172,6 +196,7 @@ private class Burbuja(texto: String, fondo: Color) extends JLabel(texto, SwingCo
     g2.dispose()
     super.paintComponent(g)
 
+// Compone la ventana y traduce eventos a operaciones del modelo.
 private class VentanaBilletera extends JFrame("YourWallet"):
   import Estilo.*
 
@@ -180,6 +205,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     case Exito(billetera) => billetera
     case Error(mensaje) => throw new IllegalStateException(mensaje)
 
+  // Referencias a componentes que se refrescan al aceptar cambios del dominio.
   private val saldoValor = etiqueta("", 38, tinta, true)
   private val ingresosValor = etiqueta("", 25, verde, true)
   private val gastosValor = etiqueta("", 25, rojo, true)
@@ -189,18 +215,22 @@ private class VentanaBilletera extends JFrame("YourWallet"):
   private val barraOcio = new BarraColor(acento)
   private val lista = new JPanel()
   private val categoriasGrafico = new JPanel()
+  // Controles de consulta; filtran la vista y no eliminan movimientos.
   private val busqueda = campo()
   private val filtroTipo = new JComboBox[String](Array("Todos", "Ingresos", "Gastos"))
+  // Campos para registrar movimientos; sus textos se adaptan antes de llamar al modelo.
   private val descripcion = campo()
   private val monto = campo()
   private val tipo = new JComboBox[String](Array("Gasto", "Ingreso"))
   private val categoria = new JComboBox[Categoria]()
+  // Entradas y resultados de una proyección, independientes del formulario de registro.
   private val simMonto = campo()
   private val simCategoria = new JComboBox[Categoria](Categoria.deGasto.toArray)
   private val resultadoSimulacion = new JPanel()
   private val cantidadLabel = etiqueta("", 13, tenue)
   private val accionesPanel = new JTabbedPane()
   private val aviso = etiqueta("", 12, acento, true)
+  // Referencias y temporizadores exclusivamente visuales para navegación y avisos.
   private var formularioPanel: JPanel = null
   private var movimientosPanel: JPanel = null
   private var animacionScroll: Timer = null
@@ -213,6 +243,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
   setLocationRelativeTo(null)
   getContentPane.setBackground(fondo)
 
+  // Contenedor exterior: cabecera fija, contenido desplazable y aviso de estado.
   private val raiz = new JPanel(new BorderLayout(0, 18))
   raiz.setBackground(fondo)
   raiz.setBorder(new EmptyBorder(22, 27, 14, 27))
@@ -240,12 +271,14 @@ private class VentanaBilletera extends JFrame("YourWallet"):
   prepararEventos()
   actualizarTodo()
 
+  // Detiene las animaciones y avisos antes de liberar la ventana.
   override def dispose(): Unit =
     if animacionScroll != null then animacionScroll.stop()
     if animacionOcio != null then animacionOcio.stop()
     if temporizadorAviso != null then temporizadorAviso.stop()
     super.dispose()
 
+  // Construye marca, fecha, accesos rápidos y vaciado con confirmación.
   private def crearCabecera(): JPanel =
     val panel = new JPanel(new BorderLayout(24, 0))
     panel.setOpaque(false)
@@ -282,6 +315,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     val limpiar = boton("Empezar en blanco")
     limpiar.setToolTipText("Eliminar todos los movimientos de esta sesión")
     limpiar.addActionListener((_: ActionEvent) =>
+      // Una sesión ya vacía no necesita confirmación; con movimientos se exige aceptación.
       val confirmar = actual.transacciones.isEmpty || JOptionPane.showConfirmDialog(this,
         "¿Eliminar todos los movimientos? Esta acción no se puede deshacer.",
         "Empezar en blanco", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION
@@ -296,6 +330,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     panel.add(acciones, BorderLayout.EAST)
     panel
 
+  // Presenta saldo, ingresos y gastos leídos del modelo en tres tarjetas.
   private def crearResumen(): JPanel =
     val contenedor = new JPanel(new BorderLayout())
     contenedor.setOpaque(false)
@@ -309,6 +344,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     contenedor.add(tarjetas, BorderLayout.CENTER)
     contenedor
 
+  // Reutiliza la composición de título e importe para las tarjetas de resumen.
   private def tarjetaNumero(titulo: String, valor: JLabel, color: Color,
       fondoIcono: Color): JPanel =
     val card = new Tarjeta()
@@ -329,6 +365,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     card.add(interior)
     card
 
+  // Organiza historial y gráfico a la izquierda; acciones y auditoría a la derecha.
   private def crearCuerpo(): JPanel =
     val cuerpo = new JPanel(new GridBagLayout())
     cuerpo.setOpaque(false)
@@ -346,16 +383,20 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     derecha.setLayout(new BoxLayout(derecha, BoxLayout.Y_AXIS))
     formularioPanel = crearFormulario()
     accionesPanel.setUI(new javax.swing.plaf.basic.BasicTabbedPaneUI():
+      // Resalta la pestaña activa con un fondo de contraste.
       override protected def paintTabBackground(g: Graphics, placement: Int, index: Int,
           x: Int, y: Int, w: Int, h: Int, selected: Boolean): Unit =
         g.setColor(if selected then acentoClaro else fondo)
         g.fillRect(x, y, w, h)
+      // La línea inferior identifica visualmente la pestaña seleccionada.
       override protected def paintTabBorder(g: Graphics, placement: Int, index: Int,
           x: Int, y: Int, w: Int, h: Int, selected: Boolean): Unit =
         if selected then
           g.setColor(acento)
           g.fillRect(x, y + h - 2, w, 2)
+      // Las tarjetas internas ya dibujan su borde; evita duplicarlo.
       override protected def paintContentBorder(g: Graphics, placement: Int, selected: Int): Unit = ()
+      // Sustituye el dibujo nativo por el estilo de selección definido para las pestañas.
       override protected def paintFocusIndicator(g: Graphics, placement: Int,
           rects: Array[Rectangle], index: Int, iconRect: Rectangle, textRect: Rectangle,
           selected: Boolean): Unit = ()
@@ -379,6 +420,8 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     cuerpo.add(derecha, b)
     cuerpo
 
+  // Desplaza la vista hasta el formulario y cancela una navegación anterior en curso.
+  // El avance usa tiempo transcurrido para mantener la duración aunque se retrasen eventos.
   private def irA(panel: JPanel): Unit =
     if panel != null then
       if animacionScroll != null then animacionScroll.stop()
@@ -396,6 +439,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
       )
       animacionScroll.start()
 
+  // Muestra confirmación no modal y reemplaza el temporizador de cualquier aviso previo.
   private def mostrarAviso(mensaje: String): Unit =
     aviso.setText(mensaje)
     aviso.setVisible(true)
@@ -404,6 +448,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     temporizadorAviso.setRepeats(false)
     temporizadorAviso.start()
 
+  // Anima solo la barra visual; el diagnóstico ya fue calculado por el modelo.
   private def animarOcio(destino: Int): Unit =
     if animacionOcio != null then animacionOcio.stop()
     val inicio = barraOcio.getValue
@@ -415,6 +460,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     )
     animacionOcio.start()
 
+  // Monta buscador, filtro de tipo y un historial con desplazamiento independiente.
   private def crearMovimientos(): JPanel =
     val card = new Tarjeta()
     card.setBorder(new EmptyBorder(24, 24, 18, 24))
@@ -456,6 +502,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     card.add(cuerpo)
     card
 
+  // Prepara el contenedor de los totales por categoría; los datos se cargan al actualizar.
   private def crearGrafico(): JPanel =
     val card = new Tarjeta()
     card.setBorder(new EmptyBorder(23, 24, 23, 24))
@@ -472,6 +519,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     card.add(interior)
     card
 
+  // Crea entradas de registro y conecta Guardar con registrarMovimiento.
   private def crearFormulario(): JPanel =
     val card = new Tarjeta()
     card.setBorder(new EmptyBorder(23, 24, 23, 24))
@@ -501,6 +549,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     card.add(interior)
     card
 
+  // Asocia visualmente una etiqueta a un control con tamaño y espaciado comunes.
   private def campoConTitulo(titulo: String, componente: JComponent): JPanel =
     val panel = new JPanel(new BorderLayout(0, 7))
     panel.setOpaque(false)
@@ -510,6 +559,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     panel.add(componente, BorderLayout.CENTER)
     panel
 
+  // Presenta la regla de ocio y sus importes; no calcula ni decide el diagnóstico.
   private def crearAuditoria(): JPanel =
     val card = new Tarjeta()
     card.setBorder(new EmptyBorder(23, 24, 23, 24))
@@ -535,6 +585,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     card.add(interior)
     card
 
+  // Prepara entradas de compra hipotética y el espacio para mostrar la proyección.
   private def crearSimulador(): JPanel =
     val card = new Tarjeta()
     card.setBorder(new EmptyBorder(23, 24, 23, 24))
@@ -563,8 +614,10 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     card.add(interior)
     card
 
+  // Mantiene contraste, borde y navegación por teclado en los selectores.
   private def decorarCombo[A](combo: JComboBox[A]): Unit =
     combo.setUI(new javax.swing.plaf.basic.BasicComboBoxUI():
+      // Reemplaza la flecha nativa para que combine con el tema.
       override protected def createArrowButton(): JButton =
         val flecha = new javax.swing.plaf.basic.BasicArrowButton(SwingConstants.SOUTH, blanco, blanco, tenue, blanco)
         flecha.setBackground(blanco)
@@ -578,6 +631,8 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     combo.setFocusable(true)
     combo.setBorder(BorderFactory.createLineBorder(borde, 1, true))
 
+  // Enlaza cambios de campos y selectores con las actualizaciones de vista.
+  // Enter en monto registra o simula; editar una búsqueda solo actualiza el historial.
   private def prepararEventos(): Unit =
     tipo.addActionListener((_: ActionEvent) => actualizarCategorias())
     actualizarCategorias()
@@ -586,16 +641,21 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     simMonto.addActionListener((_: ActionEvent) => simularCompra())
     filtroTipo.addActionListener((_: ActionEvent) => actualizarLista())
     busqueda.getDocument.addDocumentListener(new DocumentListener:
+      // Una inserción en el texto aplica de nuevo el filtro.
       def insertUpdate(e: DocumentEvent): Unit = actualizarLista()
+      // Un borrado de texto también debe refrescar las coincidencias.
       def removeUpdate(e: DocumentEvent): Unit = actualizarLista()
+      // Completa el contrato DocumentListener para cambios del documento.
       def changedUpdate(e: DocumentEvent): Unit = actualizarLista()
     )
 
+  // Ofrece categorías del tipo elegido; el modelo vuelve a validar la compatibilidad.
   private def actualizarCategorias(): Unit =
     categoria.removeAllItems()
     val opciones = if tipo.getSelectedItem == "Ingreso" then Categoria.deIngreso else Categoria.deGasto
     opciones.foreach(categoria.addItem)
     categoria.setRenderer(new DefaultListCellRenderer():
+      // Muestra el nombre legible de Categoria en lugar del nombre interno del objeto.
       override def getListCellRendererComponent(list: JList[?], value: Object,
           index: Int, selected: Boolean, focus: Boolean): Component =
         val item = super.getListCellRendererComponent(list, value, index, selected, focus)
@@ -606,6 +666,8 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     )
     simCategoria.setRenderer(categoria.getRenderer)
 
+  // Adapta el texto, obtiene fecha e ID en interfaz y entrega un candidato al modelo.
+  // Solo Exito reemplaza actual; Error conserva los movimientos y muestra el motivo.
   private def registrarMovimiento(): Unit =
     EntradaInterfaz.parsearMonto(monto.getText) match
       case Error(error) => mostrarError(error)
@@ -630,6 +692,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
             mostrarAviso("Movimiento guardado.")
             descripcion.requestFocusInWindow()
 
+  // Borra una proyección anterior y pide una nueva al modelo, sin reemplazar actual.
   private def simularCompra(): Unit =
     // No conservar una proyección anterior si el nuevo intento es inválido.
     resultadoSimulacion.removeAll()
@@ -654,6 +717,8 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     resultadoSimulacion.revalidate()
     resultadoSimulacion.repaint()
 
+  // Sincroniza resumen, auditoría, historial y gráfico con la billetera vigente.
+  // Descarta proyecciones previas porque ya no describen la versión actual.
   private def actualizarTodo(): Unit =
     saldoValor.setText(dinero(actual.saldo))
     ingresosValor.setText(dinero(actual.ingresos))
@@ -675,6 +740,8 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     resultadoSimulacion.revalidate()
     resultadoSimulacion.repaint()
 
+  // Combina búsqueda por descripción o categoría con el tipo elegido.
+  // La lista mostrada es una consulta; actual conserva todos sus movimientos.
   private def actualizarLista(): Unit =
     val texto = busqueda.getText.trim.toLowerCase
     val tipoElegido = filtroTipo.getSelectedItem
@@ -696,6 +763,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     lista.revalidate()
     lista.repaint()
 
+  // Asigna un marcador de presentación a cada alternativa tipada.
   private def iconoCategoria(categoria: Categoria): String = categoria match
     case Salario => "S"
     case Alimentacion => "A"
@@ -705,6 +773,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     case Salud => "+"
     case Otros => "·"
 
+  // Dibuja un movimiento; su botón de borrado usa el ID y recibe una billetera nueva.
   private def filaMovimiento(tx: Transaccion): JPanel =
     val fila = new JPanel(new BorderLayout(12, 0))
     fila.setOpaque(false)
@@ -746,6 +815,8 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     fila.add(acciones, BorderLayout.EAST)
     fila
 
+  // Obtiene totales del modelo, ordena categorías y muestra sus proporciones.
+  // La división entera solo determina el ancho visual; no cambia los importes del modelo.
   private def actualizarGrafico(): Unit =
     categoriasGrafico.removeAll()
     val datos = actual.totalesPorCategoria.filter(_._2 > 0).sortBy(par => -par._2)
@@ -780,5 +851,6 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     categoriasGrafico.revalidate()
     categoriasGrafico.repaint()
 
+  // Presenta al usuario un rechazo de formato o del modelo mediante un diálogo.
   private def mostrarError(mensaje: String): Unit =
     JOptionPane.showMessageDialog(this, mensaje, "Revisa los datos", JOptionPane.WARNING_MESSAGE)

@@ -2,23 +2,28 @@ package billeteraclara
 
 // Pruebas ejecutables sin dependencias externas. Los fallos terminan con una excepción.
 object Verificacion:
+  // Hace fallar la ejecución ante una condición falsa; evita informar éxito si una regla falla.
   private def comprobar(condicion: Boolean, mensaje: String): Unit =
     if !condicion then throw new RuntimeException(mensaje)
 
+  // Extrae un éxito esperado; un Error aquí significa que el caso de prueba no pudo prepararse.
   private def obtener[A](resultado: Resultado[A]): A = resultado match
     case Exito(valor) => valor
     case Error(mensaje) => throw new RuntimeException(s"Se esperaba éxito: $mensaje")
 
+  // Permite comprobar rechazos de cualquier Resultado sin depender de un texto concreto.
   private def esError[A](resultado: Resultado[A]): Boolean = resultado match
     case Error(_) => true
     case Exito(_) => false
 
+  // Recorre entradas inválidas por recursión y comprueba que el adaptador las rechace.
   private def comprobarEntradas(entradas: List[String]): Unit = entradas match
     case Nil => ()
     case cabeza :: cola =>
       comprobar(esError(EntradaInterfaz.parsearMonto(cabeza)), s"Rechazar entrada inválida: $cabeza")
       comprobarEntradas(cola)
 
+  // Ejecuta escenarios reproducibles sin abrir Swing; las excepciones señalan fallos.
   def main(args: Array[String]): Unit =
     // Extremos expresados con literales y aritmética, sin APIs adicionales.
     val mayorLong: Long = 9223372036854775807L
@@ -31,6 +36,7 @@ object Verificacion:
     val conComida = obtener(conSueldo.registrar(comida))
     val completa = obtener(conComida.registrar(ocio))
 
+    // Verifica versiones inmutables, totales y búsquedas antes de probar proyecciones.
     comprobar(vacia.transacciones.isEmpty, "Registrar debe conservar la billetera original")
     comprobar(conSueldo.transacciones.length == 1, "Las versiones anteriores no cambian")
     comprobar(completa.saldo == 0L, "100 - 80 - 20 = 0 bolivianos")
@@ -63,6 +69,7 @@ object Verificacion:
       completa.diagnostico.gastoOcio == 2000L,
       "Un gasto de Ocio actualiza ambos importes de la auditoría")
 
+    // Caso frontera: superar el umbral de ocio y quedar sin fondos son resultados separados.
     val simulada = obtener(completa.simularCompra(1L, Ocio))
     comprobar(simulada.saldoActual == 0L && simulada.saldoProyectado == -1L,
       "Compra sin saldo debe proyectar un saldo negativo")
@@ -87,6 +94,7 @@ object Verificacion:
     comprobar(!obtener(centavos.simularCompra(21L, Alimentacion)).compraPosible,
       "Un centavo de déficit debe ser insuficiente")
 
+    // Rechazos de registro y simulación: no deben introducir datos inválidos ni alterar el estado.
     comprobar(esError(vacia.registrar(sueldo.copy(montoCentavos = 0L))), "Rechazar monto cero")
     comprobar(esError(vacia.registrar(sueldo.copy(montoCentavos = -1L))), "Rechazar monto negativo")
     comprobar(esError(vacia.registrar(sueldo.copy(montoCentavos = menorLong))), "Rechazar mínimo Long")
@@ -104,6 +112,7 @@ object Verificacion:
     comprobar(vacia.transacciones.isEmpty && conSueldo.transacciones == List(sueldo),
       "Los rechazos deben conservar el estado original")
 
+    // Cubre el límite exacto, su exceso y la seguridad de los productos de la auditoría.
     val limite = obtener(vacia.registrar(sueldo.copy(montoCentavos = Dinero.limiteCentavos)))
     comprobar(limite.saldo == Dinero.limiteCentavos, "Aceptar el límite exacto")
     comprobar(esError(limite.registrar(comida.copy(montoCentavos = 1L))), "Rechazar exceso acumulado")
@@ -112,6 +121,7 @@ object Verificacion:
     comprobar(maximoOcio.diagnostico.estado == Alerta && maximoOcio.diagnostico.porcentajeOcio == 100.0,
       "El cálculo del umbral no debe desbordarse con el máximo permitido")
 
+    // Comprueba borrado por ID, conservación de la versión anterior y reutilización del ID.
     val eliminada = completa.eliminar("2")
     comprobar(eliminada.transacciones == List(ocio, sueldo), "Eliminar únicamente el identificador indicado")
     comprobar(completa.transacciones.length == 3, "Eliminar debe conservar la billetera original")
@@ -121,6 +131,7 @@ object Verificacion:
       "Un identificador eliminado puede registrarse de nuevo")
     comprobar(limite.eliminar("1").ingresos == 0L, "Eliminar libera el límite de importes")
 
+    // Valida bisiestos, siglos y extremos de día, mes y año.
     comprobar(Fecha(29, 2, 2024).esValida && Fecha(29, 2, 2000).esValida, "Años bisiestos")
     comprobar(!Fecha(29, 2, 2026).esValida && !Fecha(29, 2, 1900).esValida, "Años no bisiestos")
     comprobar(!Fecha(0, 1, 2026).esValida && !Fecha(32, 1, 2026).esValida, "Días fuera de rango")
@@ -183,6 +194,7 @@ object Verificacion:
       "999999999999999999999999999999999999")
     comprobarEntradas(entradasInvalidas)
 
+    // Contrasta los importes de demostración contra los resultados prometidos en la documentación.
     val demo = obtener(DatosDemo.ejemplo)
     comprobar(demo.ingresos == 315000L && demo.gastos == 56730L && demo.saldo == 258270L,
       "Los datos de demostración deben coincidir con la documentación")
