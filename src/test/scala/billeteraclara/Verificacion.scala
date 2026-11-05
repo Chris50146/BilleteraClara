@@ -53,6 +53,16 @@ object Verificacion:
       "La billetera vacía no divide entre cero")
     comprobar(vacia.diagnostico.estado == Saludable, "Sin gastos no hay alerta de ocio")
 
+    comprobar(conSueldo.ingresos == 10000L && conSueldo.diagnostico.totalGastos == 0L,
+      "Desde blanco, un ingreso actualiza los ingresos sin inventar gastos")
+    comprobar(conComida.diagnostico.totalGastos == 8000L &&
+      conComida.diagnostico.gastoOcio == 0L &&
+      conComida.diagnostico.porcentajeOcio == 0.0,
+      "Un gasto de Alimentación aumenta el gasto total, no el de Ocio")
+    comprobar(completa.diagnostico.totalGastos == 10000L &&
+      completa.diagnostico.gastoOcio == 2000L,
+      "Un gasto de Ocio actualiza ambos importes de la auditoría")
+
     val simulada = obtener(completa.simularCompra(1L, Ocio))
     comprobar(simulada.saldoActual == 0L && simulada.saldoProyectado == -1L,
       "Compra sin saldo debe proyectar un saldo negativo")

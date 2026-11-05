@@ -119,9 +119,9 @@ SHA-256 del ZIP del curso: `81468fca26bed498d103ea2d2de1aaaed78283869df3820369c0
 | `src/main/scala/billeteraclara/Billetera.scala` | `dac50761f910abfc70cfc15392fe072f6a718e1fff2aaf0b795c76d6590b765c` |
 | `src/main/scala/billeteraclara/DatosDemo.scala` | `e8dd7f5418f681bdbc7e3403e0672e886958b2896f02876459731338e0c11bee` |
 | `src/main/scala/billeteraclara/EntradaInterfaz.scala` | `ec8e7e3b2ba02208bc2a3389105900c13ee0acad9851fad29e293bac3fd8d29f` |
-| `src/main/scala/billeteraclara/Main.scala` | `36c12186898305f4ee8d692671120efc8e331025e043103d428f1f9e987b1c83` |
+| `src/main/scala/billeteraclara/Main.scala` | `400a3d50e032f5c4b260a828ebf90cddbbc3e19dc2f6d18e5ba92e7e637ebf11` |
 | `src/main/scala/billeteraclara/Modelo.scala` | `d1ad84a5df337bbf17eeef3792c15c0c1d417b8c2ba2da857d2f4a787663de98` |
-| `src/test/scala/billeteraclara/Verificacion.scala` | `e2b95c6ebc777795c1b7fc0490d11eb39e998f5e2c4687cdfa815e2d3730c95b` |
+| `src/test/scala/billeteraclara/Verificacion.scala` | `1ab05f776e07c063c4b1c58a9bad92d2f38aba99ad2fe907daad84821c07da96` |
 
 ## Revisión final para presentación (4 de noviembre de 2026)
 
@@ -144,3 +144,13 @@ Se reprodujo desde Swing el registro de las seis categorías de gasto: todas se 
 Se incorporaron comprobaciones del modelo para las seis categorías de gasto, las dos categorías de ingreso, sus totales y simulaciones por categoría sin modificar los movimientos originales. Emplean foldLeft, map, filter, case classes y funciones ya respaldadas en esta auditoría.
 
 Validación de la corrección: compilación y comprobaciones completas correctas, incluidas las ejecutadas desde el ZIP descomprimido. Un auxiliar temporal de Swing verificó las seis categorías de gasto y la visibilidad tras registrar bajo búsqueda «ocio» y bajo filtro de tipo incompatible. También pasó el recorrido de búsqueda, filtro, registro, simulación, alerta independiente del saldo, eliminación, sesión vacía, compra exacta y rechazo de registro inválido. La evidencia corresponde a Java gráfico sobre Linux con pantalla virtual.
+
+## Integración de BilleteraClara-Visual (5 de noviembre de 2026)
+
+El ZIP del compañero contiene los mismos Modelo, Billetera, DatosDemo y EntradaInterfaz que el repositorio. Se integró su Main visual: logo, cabecera con degradado, tarjetas, iconos, avisos, accesos rápidos, animaciones, confirmación de vaciado y totales visibles en auditoría. Se conservó la limpieza de filtros tras guardar, el foco de teclado y el renderizado básico de botones para respetar sus colores. Al disponer la ventana se detienen los temporizadores de interfaz. Las referencias mutables adicionales controlan presentación; no trasladan reglas del negocio.
+
+Se combinaron las comprobaciones del compañero sobre ingresos y auditoría sin ocio con las comprobaciones existentes de todas las categorías. No se introdujeron recursos nuevos en el modelo ni en las comprobaciones: las expresiones añadidas usan funciones y operaciones ya documentadas en esta auditoría. README, documento del sistema y guía de exposición se ajustaron a la interfaz integrada.
+
+Validación de la integración: comprobaciones completas del modelo y adaptador y compilación correctas. Las pruebas temporales de Swing verificaron registros de todas las categorías, limpieza de filtros, búsqueda, proyección, saldo exacto, rechazo de entrada inválida, eliminación y sesión vacía. También verificaron cancelar y aceptar el vaciado, accesos rápidos de ingreso/gasto, registro y simulación con Enter, auditoría de gastos sin ocio, finalización de animaciones y detención de temporizadores al disponer la ventana. Se revisaron visualmente la pantalla inicial y la parte inferior (gráfico, auditoría y simulador) en Linux con Java gráfico; no se probó el aspecto nativo en Windows ni macOS.
+
+El ZIP integrado fue regenerado, validado byte a byte contra los archivos de entrega y probado desde una extracción independiente. Los auxiliares gráficos de revisión permanecen fuera del repositorio y del paquete.

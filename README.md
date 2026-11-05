@@ -2,6 +2,8 @@
 
 Proyecto final de Programación Funcional en Scala 3, de Israel Vargas y Christian Campero. Mini sistema de finanzas personales con interfaz Swing: registra ingresos y gastos, calcula el saldo, filtra movimientos, audita el porcentaje de ocio y simula compras sin modificar los registros.
 
+La interfaz incorpora logo, tarjetas, iconos por categoría, animaciones y avisos. La auditoría muestra ingresos y gastos totales: todos los gastos se registran, mientras que solo los de Ocio contribuyen al importe de ocio; su porcentaje también puede disminuir al añadir gastos de otras categorías. Al guardar se quitan los filtros para mostrar el nuevo movimiento.
+
 ## Ejecutar
 
 Requiere Java 17 o superior y Scala CLI. Para abrir Swing, Java debe incluir soporte gráfico (no solo `headless`) y debe haber una pantalla activa. Desde la raíz del repositorio:
