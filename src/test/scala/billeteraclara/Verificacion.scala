@@ -135,6 +135,33 @@ object Verificacion:
     comprobar(Fecha(28, 2, 1900).esValida && Fecha(1, 1, 1).esValida,
       "Aceptar el fin de febrero no bisiesto y el año mínimo")
 
+    // Cada categoría admitida debe registrarse y acumularse, no únicamente Ocio.
+    val todasGastos = Categoria.deGasto.foldLeft(vacia)((billetera, cat) =>
+      obtener(billetera.registrar(Transaccion(cat.nombre, cat.nombre, 100L,
+        Fecha(1, 1, 2026), cat, Gasto)))
+    )
+    comprobar(todasGastos.transacciones.length == Categoria.deGasto.length &&
+      todasGastos.gastos == 600L && todasGastos.saldo == -600L,
+      "Registrar las seis categorías de gasto")
+    comprobar(todasGastos.diagnostico.gastoOcio == 100L,
+      "Solo Ocio contribuye al numerador de la auditoría; todos contribuyen al gasto total")
+    val sumasCategorias = todasGastos.totalesPorCategoria.filter(par => par match
+      case (_, total) => total == 100L
+    )
+    comprobar(sumasCategorias.length == 6, "Cada categoría de gasto tiene su propio total")
+    val todosIngresos = Categoria.deIngreso.foldLeft(vacia)((billetera, cat) =>
+      obtener(billetera.registrar(Transaccion(cat.nombre, cat.nombre, 100L,
+        Fecha(1, 1, 2026), cat, Ingreso)))
+    )
+    comprobar(todosIngresos.ingresos == 200L && todosIngresos.gastos == 0L,
+      "Registrar Salario y Otros como ingresos")
+    val proyecciones = Categoria.deGasto.map(cat => obtener(todasGastos.simularCompra(100L, cat)))
+    comprobar(proyecciones.filter(s => s.saldoProyectado == -700L &&
+      s.diagnosticoProyectado.totalGastos == 700L).length == 6,
+      "Simular todas las categorías sin omitir gastos")
+    comprobar(todasGastos.transacciones.length == 6 && todasGastos.gastos == 600L,
+      "Las simulaciones por categoría conservan los registros")
+
     // El adaptador de la interfaz también se comprueba sin abrir una ventana.
     comprobar(obtener(EntradaInterfaz.parsearMonto("0.30")) == 30L, "Convertir decimales exactos")
     comprobar(obtener(EntradaInterfaz.parsearMonto(" 25,50 ")) == 2550L, "Aceptar coma decimal y espacios externos")

@@ -96,7 +96,7 @@ No se requiere utilizar todas las operaciones citadas en el enunciado: se aplica
 
 ## 7. Interfaz gráfica asociada
 
-Se utiliza `javax.swing`, la alternativa de JVM contemplada en la propuesta. La interfaz muestra saldo, ingresos, gastos, movimientos, distribución por categoría, auditoría y simulación. El buscador tiene una etiqueta visible y los selectores permiten navegación con teclado. Los botones invocan el modelo y procesan `Exito` o `Error` mediante `match`.
+Se utiliza `javax.swing`, la alternativa de JVM contemplada en la propuesta. La interfaz muestra saldo, ingresos, gastos, movimientos, distribución por categoría, auditoría y simulación. Después de registrar correctamente, la interfaz limpia la búsqueda y restablece el filtro a Todos para que el nuevo movimiento no quede oculto. El buscador tiene una etiqueta visible y los selectores permiten navegación con teclado. Los botones invocan el modelo y procesan `Exito` o `Error` mediante `match`.
 
 `Main.scala` contiene Swing, formato visual, eventos, fecha del sistema e identificadores. Su única variable de estado propia es `actual`, que referencia la versión vigente de la billetera. Los objetos del dominio y sus listas siguen siendo inmutables.
 

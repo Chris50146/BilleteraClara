@@ -119,9 +119,9 @@ SHA-256 del ZIP del curso: `81468fca26bed498d103ea2d2de1aaaed78283869df3820369c0
 | `src/main/scala/billeteraclara/Billetera.scala` | `dac50761f910abfc70cfc15392fe072f6a718e1fff2aaf0b795c76d6590b765c` |
 | `src/main/scala/billeteraclara/DatosDemo.scala` | `e8dd7f5418f681bdbc7e3403e0672e886958b2896f02876459731338e0c11bee` |
 | `src/main/scala/billeteraclara/EntradaInterfaz.scala` | `ec8e7e3b2ba02208bc2a3389105900c13ee0acad9851fad29e293bac3fd8d29f` |
-| `src/main/scala/billeteraclara/Main.scala` | `36e05bedbf687e94b68aa8b40990cfa63fb75e52bb6918aff7ef3ea9373ab4ce` |
+| `src/main/scala/billeteraclara/Main.scala` | `36c12186898305f4ee8d692671120efc8e331025e043103d428f1f9e987b1c83` |
 | `src/main/scala/billeteraclara/Modelo.scala` | `d1ad84a5df337bbf17eeef3792c15c0c1d417b8c2ba2da857d2f4a787663de98` |
-| `src/test/scala/billeteraclara/Verificacion.scala` | `065e079fbe084cb9c22fe9980776b7b5083a9e2daaf0e20839d59468675885ce` |
+| `src/test/scala/billeteraclara/Verificacion.scala` | `e2b95c6ebc777795c1b7fc0490d11eb39e998f5e2c4687cdfa815e2d3730c95b` |
 
 ## Revisión final para presentación (4 de noviembre de 2026)
 
@@ -136,3 +136,11 @@ Las vías verificadas usan Scala CLI. La alternativa sbt del README no se ejecut
 El auxiliar temporal de interfaz también confirmó la compra con saldo proyectado exactamente cero, el rechazo de un registro con monto cero sin alterar el estado visible y la independencia entre saldo suficiente y alerta de ocio. El auxiliar se mantuvo fuera de los fuentes de entrega.
 
 El paquete final contiene 12 archivos y coincide byte a byte con sus archivos del checkout. Desde una extracción independiente se ejecutaron de nuevo la compilación y todas las comprobaciones, ambas con resultado correcto. Se revisaron los enlaces locales de README y documentos de entrega, así como `git diff --check`, sin errores. Los hashes de este anexo corresponden a los archivos actuales (con finales de línea LF).
+
+## Registro y filtros (5 de noviembre de 2026)
+
+Se reprodujo desde Swing el registro de las seis categorías de gasto: todas se incorporan al modelo. Una búsqueda activa «ocio» ocultaba registros nuevos de otras categorías, aunque los totales sí se actualizaban. Tras aceptar un registro, la interfaz ahora limpia la búsqueda y restablece Todos para mostrarlo. Las reglas del modelo no cambian.
+
+Se incorporaron comprobaciones del modelo para las seis categorías de gasto, las dos categorías de ingreso, sus totales y simulaciones por categoría sin modificar los movimientos originales. Emplean foldLeft, map, filter, case classes y funciones ya respaldadas en esta auditoría.
+
+Validación de la corrección: compilación y comprobaciones completas correctas, incluidas las ejecutadas desde el ZIP descomprimido. Un auxiliar temporal de Swing verificó las seis categorías de gasto y la visibilidad tras registrar bajo búsqueda «ocio» y bajo filtro de tipo incompatible. También pasó el recorrido de búsqueda, filtro, registro, simulación, alerta independiente del saldo, eliminación, sesión vacía, compra exacta y rechazo de registro inválido. La evidencia corresponde a Java gráfico sobre Linux con pantalla virtual.

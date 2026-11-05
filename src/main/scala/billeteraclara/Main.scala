@@ -404,6 +404,9 @@ private class VentanaBilletera extends JFrame("Billetera Clara"):
           case Error(error) => mostrarError(error)
           case Exito(nueva) =>
             actual = nueva
+            // Mostrar el nuevo registro aunque antes se estuviera buscando otra categoría o tipo.
+            busqueda.setText("")
+            filtroTipo.setSelectedItem("Todos")
             descripcion.setText("")
             monto.setText("")
             actualizarTodo()
