@@ -119,7 +119,7 @@ SHA-256 del ZIP del curso: `81468fca26bed498d103ea2d2de1aaaed78283869df3820369c0
 | `src/main/scala/billeteraclara/Billetera.scala` | `dac50761f910abfc70cfc15392fe072f6a718e1fff2aaf0b795c76d6590b765c` |
 | `src/main/scala/billeteraclara/DatosDemo.scala` | `e8dd7f5418f681bdbc7e3403e0672e886958b2896f02876459731338e0c11bee` |
 | `src/main/scala/billeteraclara/EntradaInterfaz.scala` | `ec8e7e3b2ba02208bc2a3389105900c13ee0acad9851fad29e293bac3fd8d29f` |
-| `src/main/scala/billeteraclara/Main.scala` | `9e1569dffa99f3873be0d7cc67f5fd7f783520de1bd2e75024f04ce8725aca11` |
+| `src/main/scala/billeteraclara/Main.scala` | `334a97f702548cabfd598882251a93540d48e57b1665548eb7efa08ca57b3bba` |
 | `src/main/scala/billeteraclara/Modelo.scala` | `d1ad84a5df337bbf17eeef3792c15c0c1d417b8c2ba2da857d2f4a787663de98` |
 | `src/test/scala/billeteraclara/Verificacion.scala` | `1ab05f776e07c063c4b1c58a9bad92d2f38aba99ad2fe907daad84821c07da96` |
 
@@ -158,3 +158,9 @@ El ZIP integrado fue regenerado, validado byte a byte contra los archivos de ent
 ## Nombre de la aplicación: YourWallet (5 de noviembre de 2026)
 
 La ventana y la cabecera muestran YourWallet; el nombre del proyecto sbt es yourwallet. Se actualizaron README, instrucciones de continuidad y documentos. El paquete de entrega se llama YourWallet-Publicar.zip y contiene la carpeta YourWallet-Publicar. El paquete Scala billeteraclara y las direcciones reales del repositorio se conservan, por lo que los comandos no cambian. Las referencias originales y los registros históricos mantienen su contexto. El cambio no modifica reglas del negocio.
+
+## Rediseño de escritorio YourWallet (5 de noviembre de 2026)
+
+La interfaz adopta superficies oscuras y verdes, cabecera compacta, mensajes directos y marcadores de categoría tipográficos. Se retiran emojis y el banner decorativo. Registrar y Simular se organizan en pestañas, con historial desplazable independiente, foco de teclado, colores consistentes de controles y animaciones basadas en tiempo. Se conservan confirmación de vaciado, filtros y su limpieza tras registro, entradas por teclado, modelo y centavos enteros. No se modifica la lógica financiera ni se introducen nuevas APIs fuera de interfaz. La documentación de entrega refleja el nuevo diseño.
+
+Validación: se revisó visualmente la ventana oscura en Linux con pantalla virtual. Pasaron las comprobaciones del modelo y adaptador, registros por todas las categorías, limpieza de filtros, búsqueda, eliminación, proyección sin registro, compra exacta y rechazo de entradas inválidas. Las pruebas de interfaz confirmaron cancelar/aceptar vaciado, accesos rápidos, registro y simulación con Enter, auditoría sin ocio y finalización y cierre de temporizadores. Se comprobó la integridad del ZIP y su coincidencia con los archivos vigentes; las comprobaciones se ejecutaron también desde una extracción independiente. El aspecto nativo en Windows/macOS no se probó.

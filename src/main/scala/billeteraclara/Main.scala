@@ -14,24 +14,29 @@ import javax.swing.event.{DocumentEvent, DocumentListener}
 object Main:
   def main(args: Array[String]): Unit =
     SwingUtilities.invokeLater(() =>
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
+      UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName)
+      val superficie = new Color(23, 31, 31)
+      val texto = new Color(232, 240, 236)
+      Array("Panel.background", "OptionPane.background", "ComboBox.background", "TextField.background").foreach(k => UIManager.put(k, superficie))
+      Array("Label.foreground", "OptionPane.messageForeground", "ComboBox.foreground", "TextField.foreground").foreach(k => UIManager.put(k, texto))
+      UIManager.put("ComboBox.selectionBackground", new Color(34, 77, 63))
+      UIManager.put("ComboBox.selectionForeground", texto)
       val ventana = new VentanaBilletera()
       ventana.setVisible(true)
     )
 
 private object Estilo:
-  val fondo = new Color(246, 247, 252)
-  val blanco = Color.WHITE
-  val tinta = new Color(30, 35, 62)
-  val tenue = new Color(112, 121, 145)
-  val borde = new Color(227, 231, 242)
-  val acento = new Color(97, 85, 230)
-  val acentoClaro = new Color(235, 233, 255)
-  val verde = new Color(20, 163, 132)
-  val verdeClaro = new Color(223, 249, 240)
-  val rojo = new Color(230, 91, 112)
-  val rojoClaro = new Color(255, 236, 241)
-  val azulOscuro = new Color(32, 36, 80)
+  val fondo = new Color(13, 20, 20)
+  val blanco = new Color(23, 31, 31) // Superficie de controles y tarjetas.
+  val tinta = new Color(233, 240, 236)
+  val tenue = new Color(157, 175, 165)
+  val borde = new Color(48, 64, 58)
+  val acento = new Color(174, 218, 125)
+  val acentoClaro = new Color(39, 59, 45)
+  val verde = new Color(110, 208, 166)
+  val verdeClaro = new Color(30, 57, 45)
+  val rojo = new Color(241, 148, 140)
+  val rojoClaro = new Color(61, 39, 38)
 
   def fuente(tamano: Int, negrita: Boolean = false): Font =
     val preferida = if System.getProperty("os.name").toLowerCase.contains("mac") then "Avenir Next" else "SansSerif"
@@ -40,6 +45,7 @@ private object Estilo:
   def etiqueta(texto: String, tamano: Int = 14, color: Color = tinta,
                negrita: Boolean = false): JLabel =
     val label = new JLabel(texto)
+    label.putClientProperty(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
     label.setFont(fuente(tamano, negrita))
     label.setForeground(color)
     label
@@ -58,49 +64,68 @@ private object Estilo:
       override def paintComponent(g: Graphics): Unit =
         val g2 = g.create().asInstanceOf[Graphics2D]
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-        val base = if principal then acento else new Color(239, 241, 249)
-        val color = if encima then (if principal then new Color(77, 66, 204) else new Color(226, 229, 246)) else base
+        val base = if principal then acento else new Color(37, 49, 44)
+        val color = if encima then (if principal then new Color(195, 234, 150) else new Color(52, 69, 60)) else base
         g2.setColor(color)
-        g2.fillRoundRect(0, 0, getWidth, getHeight, 16, 16)
+        g2.fillRoundRect(0, 0, getWidth, getHeight, 10, 10)
         g2.dispose()
         super.paintComponent(g)
     boton.setUI(new javax.swing.plaf.basic.BasicButtonUI())
     boton.setContentAreaFilled(false)
+    boton.putClientProperty(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
     boton.setFont(fuente(13, true))
-    boton.setFocusPainted(false)
+    boton.setFocusPainted(true)
     boton.setBorder(new EmptyBorder(11, 17, 11, 17))
-    boton.setForeground(if principal then blanco else acento)
+    boton.setForeground(if principal then fondo else tinta)
     boton.setOpaque(false)
     boton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR))
     boton
 
   def campo(): JTextField =
     val campo = new JTextField()
+    campo.putClientProperty(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
     campo.setFont(fuente(14))
     campo.setForeground(tinta)
     campo.setBackground(blanco)
     campo.setCaretColor(acento)
     campo.setSelectionColor(acentoClaro)
+    campo.setSelectedTextColor(tinta)
     campo.setBorder(BorderFactory.createCompoundBorder(
       BorderFactory.createLineBorder(borde, 1, true), new EmptyBorder(10, 12, 10, 12)))
     campo
+
+  def decorarScroll(scroll: JScrollPane): Unit =
+    scroll.getVerticalScrollBar.setPreferredSize(new Dimension(9, 0))
+    scroll.getVerticalScrollBar.setUI(new javax.swing.plaf.basic.BasicScrollBarUI():
+      override protected def configureScrollBarColors(): Unit =
+        thumbColor = borde
+        trackColor = fondo
+      override protected def createDecreaseButton(o: Int): JButton = ocultar()
+      override protected def createIncreaseButton(o: Int): JButton = ocultar()
+      private def ocultar(): JButton =
+        val b = new JButton()
+        b.setPreferredSize(new Dimension(0, 0))
+        b
+      override protected def paintThumb(g: Graphics, c: JComponent, r: Rectangle): Unit =
+        g.setColor(tenue)
+        g.fillRoundRect(r.x + 2, r.y, math.max(3, r.width - 4), r.height, 5, 5)
+    )
 
   def dinero(valor: Long): String =
     val absoluto = math.abs(valor)
     val signo = if valor < 0 then "-" else ""
     f"Bs $signo${absoluto / 100}%d.${absoluto % 100}%02d"
 
-private class Tarjeta(color: Color = Estilo.blanco, radio: Int = 22) extends JPanel:
+private class Tarjeta(color: Color = Estilo.blanco, radio: Int = 14) extends JPanel:
   setOpaque(false)
   setLayout(new BorderLayout())
   override def paintComponent(g: Graphics): Unit =
     val g2 = g.create().asInstanceOf[Graphics2D]
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-    for n <- 5 to 1 by -1 do
-      g2.setColor(new Color(42, 51, 109, 3))
-      g2.fillRoundRect(n, n + 2, getWidth - n * 2, getHeight - n * 2 - 2, radio, radio)
+    g2.setColor(Estilo.borde)
+    g2.fillRoundRect(0, 0, getWidth, getHeight, radio, radio)
     g2.setColor(color)
-    g2.fillRoundRect(1, 1, getWidth - 2, getHeight - 6, radio, radio)
+    g2.fillRoundRect(1, 1, getWidth - 2, getHeight - 2, radio, radio)
     g2.dispose()
     super.paintComponent(g)
 
@@ -119,21 +144,6 @@ private class Logo extends JComponent:
     g2.fillOval(39, 31, 4, 4)
     g2.dispose()
 
-private class Hero extends JPanel:
-  setOpaque(false)
-  setLayout(new BorderLayout())
-  override def paintComponent(g: Graphics): Unit =
-    val g2 = g.create().asInstanceOf[Graphics2D]
-    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-    g2.setPaint(new GradientPaint(0, 0, new Color(52, 51, 126), getWidth.toFloat, getHeight.toFloat,
-      new Color(103, 91, 224)))
-    g2.fillRoundRect(0, 0, getWidth, getHeight, 30, 30)
-    g2.setColor(new Color(255, 255, 255, 12))
-    g2.fillOval(getWidth - 185, -115, 260, 260)
-    g2.fillOval(getWidth - 310, 105, 170, 170)
-    g2.dispose()
-    super.paintComponent(g)
-
 private class BarraColor(color: Color) extends JProgressBar(0, 100):
   setOpaque(false)
   setBorderPainted(false)
@@ -141,7 +151,7 @@ private class BarraColor(color: Color) extends JProgressBar(0, 100):
   override def paintComponent(g: Graphics): Unit =
     val g2 = g.create().asInstanceOf[Graphics2D]
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-    g2.setColor(new Color(231, 234, 245))
+    g2.setColor(Estilo.borde)
     g2.fillRoundRect(0, 0, getWidth, getHeight, getHeight, getHeight)
     val ancho = (getWidth * getValue / 100.0).toInt
     if ancho > 0 then
@@ -151,7 +161,8 @@ private class BarraColor(color: Color) extends JProgressBar(0, 100):
 
 private class Burbuja(texto: String, fondo: Color) extends JLabel(texto, SwingConstants.CENTER):
   setOpaque(false)
-  setFont(Estilo.fuente(18))
+  setFont(Estilo.fuente(14, true))
+  setForeground(Estilo.tinta)
   setPreferredSize(new Dimension(38, 38))
   override def paintComponent(g: Graphics): Unit =
     val g2 = g.create().asInstanceOf[Graphics2D]
@@ -169,7 +180,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     case Exito(billetera) => billetera
     case Error(mensaje) => throw new IllegalStateException(mensaje)
 
-  private val saldoValor = etiqueta("", 32, tinta, true)
+  private val saldoValor = etiqueta("", 38, tinta, true)
   private val ingresosValor = etiqueta("", 25, verde, true)
   private val gastosValor = etiqueta("", 25, rojo, true)
   private val diagnosticoValor = etiqueta("", 15, tinta, true)
@@ -188,6 +199,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
   private val simCategoria = new JComboBox[Categoria](Categoria.deGasto.toArray)
   private val resultadoSimulacion = new JPanel()
   private val cantidadLabel = etiqueta("", 13, tenue)
+  private val accionesPanel = new JTabbedPane()
   private val aviso = etiqueta("", 12, acento, true)
   private var formularioPanel: JPanel = null
   private var movimientosPanel: JPanel = null
@@ -215,6 +227,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
   contenido.add(crearCuerpo())
 
   private val scroll = new JScrollPane(contenido)
+  decorarScroll(scroll)
   scroll.setBorder(null)
   scroll.getViewport.setBackground(fondo)
   scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER)
@@ -234,71 +247,53 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     super.dispose()
 
   private def crearCabecera(): JPanel =
-    val panel = new Hero()
-    panel.setPreferredSize(new Dimension(100, 178))
-    panel.setBorder(new EmptyBorder(20, 26, 20, 26))
-    val izquierda = new JPanel()
-    izquierda.setOpaque(false)
-    izquierda.setLayout(new BoxLayout(izquierda, BoxLayout.Y_AXIS))
+    val panel = new JPanel(new BorderLayout(24, 0))
+    panel.setOpaque(false)
+    panel.setBorder(new EmptyBorder(0, 0, 16, 0))
     val marca = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0))
     marca.setOpaque(false)
-    marca.setAlignmentX(Component.LEFT_ALIGNMENT)
     marca.add(new Logo())
-    val marcaTexto = new JPanel()
-    marcaTexto.setOpaque(false)
-    marcaTexto.setLayout(new BoxLayout(marcaTexto, BoxLayout.Y_AXIS))
-    marcaTexto.add(etiqueta("YourWallet", 16, blanco, true))
-    marcaTexto.add(etiqueta("Tus finanzas, más simples", 11, new Color(216, 216, 255)))
-    marca.add(marcaTexto)
-    izquierda.add(marca)
-    izquierda.add(Box.createVerticalStrut(11))
-    izquierda.add(etiqueta("Tu dinero, con claridad.", 27, blanco, true))
-    izquierda.add(Box.createVerticalStrut(2))
-    izquierda.add(etiqueta("Organiza tus movimientos y decide con confianza.", 12,
-      new Color(224, 225, 255)))
-    panel.add(izquierda, BorderLayout.WEST)
-
-    val derecha = new JPanel()
-    derecha.setOpaque(false)
-    derecha.setLayout(new BoxLayout(derecha, BoxLayout.Y_AXIS))
-    val fecha = etiqueta(LocalDate.now().format(
-      DateTimeFormatter.ofPattern("EEEE d 'de' MMMM", java.util.Locale.forLanguageTag("es"))),
-      12, new Color(225, 226, 255), true)
-    fecha.setAlignmentX(Component.RIGHT_ALIGNMENT)
-    derecha.add(fecha)
-    derecha.add(Box.createVerticalGlue())
-    val acciones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0))
+    val textos = new JPanel(new GridLayout(2, 1, 0, 3))
+    textos.setOpaque(false)
+    textos.add(etiqueta("YourWallet", 22, tinta, true))
+    textos.add(etiqueta("Resumen de tu sesión", 12, tenue))
+    marca.add(textos)
+    panel.add(marca, BorderLayout.WEST)
+    val acciones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 8))
     acciones.setOpaque(false)
-    val ingreso = boton("＋ Ingreso", true)
+    acciones.add(etiqueta(LocalDate.now().format(DateTimeFormatter.ofPattern(
+      "d MMM yyyy", java.util.Locale.forLanguageTag("es"))), 12, tenue))
+    val ingreso = boton("＋ Ingreso")
     ingreso.addActionListener((_: ActionEvent) =>
       tipo.setSelectedItem("Ingreso")
+      accionesPanel.setSelectedIndex(0)
+      irA(formularioPanel)
+      descripcion.requestFocusInWindow()
+    )
+    val gasto = boton("− Gasto", true)
+    gasto.addActionListener((_: ActionEvent) =>
+      tipo.setSelectedItem("Gasto")
+      accionesPanel.setSelectedIndex(0)
       irA(formularioPanel)
       descripcion.requestFocusInWindow()
     )
     acciones.add(ingreso)
-    val gasto = boton("− Gasto")
-    gasto.addActionListener((_: ActionEvent) =>
-      tipo.setSelectedItem("Gasto")
-      irA(formularioPanel)
-      descripcion.requestFocusInWindow()
-    )
     acciones.add(gasto)
-    derecha.add(acciones)
-    derecha.add(Box.createVerticalStrut(11))
-    val limpiar = boton("↺  Empezar en blanco")
-    limpiar.setToolTipText("Quita todos los movimientos de la sesión")
-    limpiar.setAlignmentX(Component.RIGHT_ALIGNMENT)
+    val limpiar = boton("Empezar en blanco")
+    limpiar.setToolTipText("Eliminar todos los movimientos de esta sesión")
     limpiar.addActionListener((_: ActionEvent) =>
-      val confirmar = actual.transacciones.isEmpty ||
-        JOptionPane.showConfirmDialog(this, "¿Quitar todos los movimientos de esta sesión?",
-          "Empezar en blanco", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION
+      val confirmar = actual.transacciones.isEmpty || JOptionPane.showConfirmDialog(this,
+        "¿Eliminar todos los movimientos? Esta acción no se puede deshacer.",
+        "Empezar en blanco", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION
       if confirmar then
         actual = Billetera.vacia(actual.usuario)
+        busqueda.setText("")
+        filtroTipo.setSelectedItem("Todos")
         actualizarTodo()
-        mostrarAviso("✨  Listo: ahora puedes registrar tus propios movimientos.")
+        mostrarAviso("Sesión vacía. Ya puedes registrar tus movimientos.")
     )
-    derecha.add(limpiar)
-    panel.add(derecha, BorderLayout.EAST)
+    acciones.add(limpiar)
+    panel.add(acciones, BorderLayout.EAST)
     panel
 
   private def crearResumen(): JPanel =
@@ -308,29 +303,29 @@ private class VentanaBilletera extends JFrame("YourWallet"):
 
     val tarjetas = new JPanel(new GridLayout(1, 3, 16, 0))
     tarjetas.setOpaque(false)
-    tarjetas.add(tarjetaNumero("💳  SALDO DISPONIBLE", saldoValor, acento, acentoClaro))
-    tarjetas.add(tarjetaNumero("↗  INGRESOS", ingresosValor, verde, verdeClaro))
-    tarjetas.add(tarjetaNumero("↘  GASTOS", gastosValor, rojo, rojoClaro))
+    tarjetas.add(tarjetaNumero("SALDO DISPONIBLE", saldoValor, acento, acentoClaro))
+    tarjetas.add(tarjetaNumero("INGRESOS", ingresosValor, verde, verdeClaro))
+    tarjetas.add(tarjetaNumero("GASTOS", gastosValor, rojo, rojoClaro))
     contenedor.add(tarjetas, BorderLayout.CENTER)
     contenedor
 
   private def tarjetaNumero(titulo: String, valor: JLabel, color: Color,
       fondoIcono: Color): JPanel =
     val card = new Tarjeta()
-    card.setPreferredSize(new Dimension(200, 136))
+    card.setPreferredSize(new Dimension(200, 148))
     card.setBorder(new EmptyBorder(22, 24, 21, 24))
     val interior = new JPanel()
     interior.setOpaque(false)
     interior.setLayout(new BoxLayout(interior, BoxLayout.Y_AXIS))
     val tituloValor = etiqueta(titulo, 11, color, true)
-    tituloValor.setOpaque(true)
+    tituloValor.setOpaque(false)
     tituloValor.setBackground(fondoIcono)
-    tituloValor.setBorder(new EmptyBorder(5, 9, 5, 9))
+    tituloValor.setBorder(new EmptyBorder(0, 0, 12, 0))
     interior.add(tituloValor)
     interior.add(Box.createVerticalGlue())
     interior.add(valor)
     interior.add(Box.createVerticalStrut(5))
-    interior.add(etiqueta("Actualizado al instante", 11, tenue))
+
     card.add(interior)
     card
 
@@ -350,11 +345,29 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     derecha.setOpaque(false)
     derecha.setLayout(new BoxLayout(derecha, BoxLayout.Y_AXIS))
     formularioPanel = crearFormulario()
-    derecha.add(formularioPanel)
+    accionesPanel.setUI(new javax.swing.plaf.basic.BasicTabbedPaneUI():
+      override protected def paintTabBackground(g: Graphics, placement: Int, index: Int,
+          x: Int, y: Int, w: Int, h: Int, selected: Boolean): Unit =
+        g.setColor(if selected then acentoClaro else fondo)
+        g.fillRect(x, y, w, h)
+      override protected def paintTabBorder(g: Graphics, placement: Int, index: Int,
+          x: Int, y: Int, w: Int, h: Int, selected: Boolean): Unit =
+        if selected then
+          g.setColor(acento)
+          g.fillRect(x, y + h - 2, w, 2)
+      override protected def paintContentBorder(g: Graphics, placement: Int, selected: Int): Unit = ()
+      override protected def paintFocusIndicator(g: Graphics, placement: Int,
+          rects: Array[Rectangle], index: Int, iconRect: Rectangle, textRect: Rectangle,
+          selected: Boolean): Unit = ()
+    )
+    accionesPanel.setFont(fuente(13, true))
+    accionesPanel.setForeground(tinta)
+    accionesPanel.setBackground(blanco)
+    accionesPanel.addTab("Registrar", formularioPanel)
+    accionesPanel.addTab("Simular compra", crearSimulador())
+    derecha.add(accionesPanel)
     derecha.add(Box.createVerticalStrut(18))
     derecha.add(crearAuditoria())
-    derecha.add(Box.createVerticalStrut(18))
-    derecha.add(crearSimulador())
 
     val a = new GridBagConstraints()
     a.gridx = 0; a.gridy = 0; a.weightx = 0.62; a.weighty = 1
@@ -373,9 +386,9 @@ private class VentanaBilletera extends JFrame("YourWallet"):
       val posicion = SwingUtilities.convertPoint(panel, 0, 0, contenido).y
       val maximo = math.max(0, contenido.getHeight - scroll.getViewport.getHeight)
       val destino = posicion.min(maximo)
-      var paso = 0
+      val inicioAnimacion = System.nanoTime()
       animacionScroll = new Timer(16, (_: ActionEvent) =>
-        paso += 1
+        val paso = math.min(15, ((System.nanoTime() - inicioAnimacion) / 16000000L).toInt)
         val avance = 1.0 - math.pow(1.0 - paso / 15.0, 3)
         scroll.getViewport.setViewPosition(new Point(0,
           (inicio + (destino - inicio) * avance).toInt))
@@ -394,9 +407,9 @@ private class VentanaBilletera extends JFrame("YourWallet"):
   private def animarOcio(destino: Int): Unit =
     if animacionOcio != null then animacionOcio.stop()
     val inicio = barraOcio.getValue
-    var paso = 0
+    val inicioAnimacion = System.nanoTime()
     animacionOcio = new Timer(18, (_: ActionEvent) =>
-      paso += 1
+      val paso = math.min(15, ((System.nanoTime() - inicioAnimacion) / 18000000L).toInt)
       barraOcio.setValue(inicio + (destino - inicio) * paso / 15)
       if paso >= 15 then animacionOcio.stop()
     )
@@ -411,7 +424,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     val cabecera = new JPanel(new BorderLayout())
     cabecera.setOpaque(false)
     cabecera.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28))
-    cabecera.add(etiqueta("📒  Movimientos", 20, tinta, true), BorderLayout.WEST)
+    cabecera.add(etiqueta("Movimientos", 20, tinta, true), BorderLayout.WEST)
     cabecera.add(cantidadLabel, BorderLayout.EAST)
     cuerpo.add(cabecera)
     cuerpo.add(Box.createVerticalStrut(18))
@@ -432,7 +445,14 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     cuerpo.add(Box.createVerticalStrut(12))
     lista.setOpaque(false)
     lista.setLayout(new BoxLayout(lista, BoxLayout.Y_AXIS))
-    cuerpo.add(lista)
+    val historial = new JScrollPane(lista)
+    decorarScroll(historial)
+    historial.setBorder(null)
+    historial.getViewport.setBackground(blanco)
+    historial.setPreferredSize(new Dimension(450, 310))
+    historial.getVerticalScrollBar.setUnitIncrement(20)
+    historial.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER)
+    cuerpo.add(historial)
     card.add(cuerpo)
     card
 
@@ -442,9 +462,9 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     val interior = new JPanel()
     interior.setOpaque(false)
     interior.setLayout(new BoxLayout(interior, BoxLayout.Y_AXIS))
-    interior.add(etiqueta("🎨  Gastos por categoría", 18, tinta, true))
+    interior.add(etiqueta("Gastos por categoría", 18, tinta, true))
     interior.add(Box.createVerticalStrut(5))
-    interior.add(etiqueta("Distribución de tus consumos", 12, tenue))
+    interior.add(etiqueta("Importes por categoría de gasto", 12, tenue))
     interior.add(Box.createVerticalStrut(18))
     categoriasGrafico.setOpaque(false)
     categoriasGrafico.setLayout(new BoxLayout(categoriasGrafico, BoxLayout.Y_AXIS))
@@ -458,7 +478,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     val interior = new JPanel()
     interior.setOpaque(false)
     interior.setLayout(new BoxLayout(interior, BoxLayout.Y_AXIS))
-    interior.add(etiqueta("✨  Nuevo movimiento", 18, tinta, true))
+    interior.add(etiqueta("Nuevo movimiento", 18, tinta, true))
     interior.add(Box.createVerticalStrut(5))
     interior.add(etiqueta("Usa hasta dos decimales, por ejemplo: 25,50.", 12, tenue))
     interior.add(Box.createVerticalStrut(19))
@@ -496,7 +516,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     val interior = new JPanel()
     interior.setOpaque(false)
     interior.setLayout(new BoxLayout(interior, BoxLayout.Y_AXIS))
-    interior.add(etiqueta("🌿  Salud del presupuesto", 18, tinta, true))
+    interior.add(etiqueta("Regla de ocio", 18, tinta, true))
     interior.add(Box.createVerticalStrut(14))
     interior.add(diagnosticoValor)
     interior.add(Box.createVerticalStrut(6))
@@ -521,9 +541,9 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     val interior = new JPanel()
     interior.setOpaque(false)
     interior.setLayout(new BoxLayout(interior, BoxLayout.Y_AXIS))
-    interior.add(etiqueta("🔮  Simula una compra", 18, tinta, true))
+    interior.add(etiqueta("Simula una compra", 18, tinta, true))
     interior.add(Box.createVerticalStrut(5))
-    interior.add(etiqueta("Explora el impacto antes de gastar.", 12, tenue))
+    interior.add(etiqueta("Consulta el saldo y el ocio proyectados.", 12, tenue))
     interior.add(Box.createVerticalStrut(17))
     simMonto.putClientProperty("JTextField.placeholderText", "0.00")
     decorarCombo(simCategoria)
@@ -544,6 +564,14 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     card
 
   private def decorarCombo[A](combo: JComboBox[A]): Unit =
+    combo.setUI(new javax.swing.plaf.basic.BasicComboBoxUI():
+      override protected def createArrowButton(): JButton =
+        val flecha = new javax.swing.plaf.basic.BasicArrowButton(SwingConstants.SOUTH, blanco, blanco, tenue, blanco)
+        flecha.setBackground(blanco)
+        flecha.setForeground(tinta)
+        flecha.setBorder(null)
+        flecha
+    )
     combo.setFont(fuente(13))
     combo.setForeground(tinta)
     combo.setBackground(blanco)
@@ -599,7 +627,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
             descripcion.setText("")
             monto.setText("")
             actualizarTodo()
-            mostrarAviso("✅  Movimiento guardado. Tu resumen ya está actualizado.")
+            mostrarAviso("Movimiento guardado.")
             descripcion.requestFocusInWindow()
 
   private def simularCompra(): Unit =
@@ -611,13 +639,13 @@ private class VentanaBilletera extends JFrame("YourWallet"):
         actual.simularCompra(valor, simCategoria.getSelectedItem.asInstanceOf[Categoria]) match
           case Error(error) => mostrarError(error)
           case Exito(s) =>
-            resultadoSimulacion.add(etiqueta("🔮  SALDO PROYECTADO", 11, acento, true))
+            resultadoSimulacion.add(etiqueta("SALDO PROYECTADO", 11, acento, true))
             resultadoSimulacion.add(Box.createVerticalStrut(4))
             resultadoSimulacion.add(etiqueta(dinero(s.saldoProyectado), 22,
               if s.compraPosible then tinta else rojo, true))
             resultadoSimulacion.add(Box.createVerticalStrut(6))
             resultadoSimulacion.add(etiqueta(
-              if s.compraPosible then "✅  Saldo suficiente" else "⚠️  Saldo insuficiente", 12,
+              if s.compraPosible then "Saldo suficiente" else "Saldo insuficiente", 12,
               if s.compraPosible then verde else rojo, true))
             resultadoSimulacion.add(Box.createVerticalStrut(3))
             resultadoSimulacion.add(etiqueta(
@@ -643,7 +671,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     actualizarLista()
     actualizarGrafico()
     resultadoSimulacion.removeAll()
-    resultadoSimulacion.add(etiqueta("💡  La simulación no modifica tus movimientos.", 12, tenue))
+    resultadoSimulacion.add(etiqueta("La simulación no modifica tus movimientos.", 12, tenue))
     resultadoSimulacion.revalidate()
     resultadoSimulacion.repaint()
 
@@ -661,7 +689,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
       (if encontrados.length == 1 then "registro" else "registros"))
     lista.removeAll()
     if encontrados.isEmpty then
-      val vacio = etiqueta("🪄  No hay movimientos para este filtro.", 13, tenue)
+      val vacio = etiqueta("No hay movimientos para este filtro.", 13, tenue)
       vacio.setBorder(new EmptyBorder(24, 0, 24, 0))
       lista.add(vacio)
     else encontrados.foreach(tx => lista.add(filaMovimiento(tx)))
@@ -669,13 +697,13 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     lista.repaint()
 
   private def iconoCategoria(categoria: Categoria): String = categoria match
-    case Salario => "💼"
-    case Alimentacion => "🥗"
-    case Transporte => "🚗"
-    case Ocio => "🎬"
-    case Hogar => "🏠"
-    case Salud => "💊"
-    case Otros => "✨"
+    case Salario => "S"
+    case Alimentacion => "A"
+    case Transporte => "T"
+    case Ocio => "O"
+    case Hogar => "H"
+    case Salud => "+"
+    case Otros => "·"
 
   private def filaMovimiento(tx: Transaccion): JPanel =
     val fila = new JPanel(new BorderLayout(12, 0))
@@ -712,7 +740,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     borrar.addActionListener((_: ActionEvent) =>
       actual = actual.eliminar(tx.id)
       actualizarTodo()
-      mostrarAviso("🗑️  Movimiento eliminado. El resumen se recalculó.")
+      mostrarAviso("Movimiento eliminado.")
     )
     acciones.add(borrar)
     fila.add(acciones, BorderLayout.EAST)
@@ -722,7 +750,7 @@ private class VentanaBilletera extends JFrame("YourWallet"):
     categoriasGrafico.removeAll()
     val datos = actual.totalesPorCategoria.filter(_._2 > 0).sortBy(par => -par._2)
     if datos.isEmpty then
-      categoriasGrafico.add(etiqueta("🫧  Tus gastos aparecerán aquí al registrarlos.", 12, tenue))
+      categoriasGrafico.add(etiqueta("Tus gastos aparecerán aquí al registrarlos.", 12, tenue))
     else
       datos.foreach { case (cat, total) =>
         val proporcion = (total * 100 / actual.gastos).toInt
