@@ -119,7 +119,7 @@ SHA-256 del ZIP del curso: `81468fca26bed498d103ea2d2de1aaaed78283869df3820369c0
 | `src/main/scala/billeteraclara/Billetera.scala` | `dac50761f910abfc70cfc15392fe072f6a718e1fff2aaf0b795c76d6590b765c` |
 | `src/main/scala/billeteraclara/DatosDemo.scala` | `e8dd7f5418f681bdbc7e3403e0672e886958b2896f02876459731338e0c11bee` |
 | `src/main/scala/billeteraclara/EntradaInterfaz.scala` | `ec8e7e3b2ba02208bc2a3389105900c13ee0acad9851fad29e293bac3fd8d29f` |
-| `src/main/scala/billeteraclara/Main.scala` | `400a3d50e032f5c4b260a828ebf90cddbbc3e19dc2f6d18e5ba92e7e637ebf11` |
+| `src/main/scala/billeteraclara/Main.scala` | `9e1569dffa99f3873be0d7cc67f5fd7f783520de1bd2e75024f04ce8725aca11` |
 | `src/main/scala/billeteraclara/Modelo.scala` | `d1ad84a5df337bbf17eeef3792c15c0c1d417b8c2ba2da857d2f4a787663de98` |
 | `src/test/scala/billeteraclara/Verificacion.scala` | `1ab05f776e07c063c4b1c58a9bad92d2f38aba99ad2fe907daad84821c07da96` |
 
@@ -154,3 +154,7 @@ Se combinaron las comprobaciones del compañero sobre ingresos y auditoría sin 
 Validación de la integración: comprobaciones completas del modelo y adaptador y compilación correctas. Las pruebas temporales de Swing verificaron registros de todas las categorías, limpieza de filtros, búsqueda, proyección, saldo exacto, rechazo de entrada inválida, eliminación y sesión vacía. También verificaron cancelar y aceptar el vaciado, accesos rápidos de ingreso/gasto, registro y simulación con Enter, auditoría de gastos sin ocio, finalización de animaciones y detención de temporizadores al disponer la ventana. Se revisaron visualmente la pantalla inicial y la parte inferior (gráfico, auditoría y simulador) en Linux con Java gráfico; no se probó el aspecto nativo en Windows ni macOS.
 
 El ZIP integrado fue regenerado, validado byte a byte contra los archivos de entrega y probado desde una extracción independiente. Los auxiliares gráficos de revisión permanecen fuera del repositorio y del paquete.
+
+## Nombre de la aplicación: YourWallet (5 de noviembre de 2026)
+
+La ventana y la cabecera muestran YourWallet; el nombre del proyecto sbt es yourwallet. Se actualizaron README, instrucciones de continuidad y documentos. El paquete de entrega se llama YourWallet-Publicar.zip y contiene la carpeta YourWallet-Publicar. El paquete Scala billeteraclara y las direcciones reales del repositorio se conservan, por lo que los comandos no cambian. Las referencias originales y los registros históricos mantienen su contexto. El cambio no modifica reglas del negocio.

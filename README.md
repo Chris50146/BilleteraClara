@@ -1,4 +1,4 @@
-# Billetera Clara
+# YourWallet
 
 Proyecto final de Programación Funcional en Scala 3, de Israel Vargas y Christian Campero. Mini sistema de finanzas personales con interfaz Swing: registra ingresos y gastos, calcula el saldo, filtra movimientos, audita el porcentaje de ocio y simula compras sin modificar los registros.
 
@@ -14,7 +14,7 @@ scala run src/main/scala --server=false --jvm system --main-class billeteraclara
 
 También se puede usar `sbt run`. La primera ejecución puede descargar Scala y las herramientas de compilación; luego utiliza la caché local. `--jvm system` usa el Java instalado.
 
-Para usar el paquete de entrega, descarga [BilleteraClara-Publicar.zip](https://github.com/Chris50146/BilleteraClara/blob/main/BilleteraClara-Publicar.zip), descomprímelo y ejecuta el mismo comando desde la carpeta `BilleteraClara-Publicar`.
+Para usar el paquete de entrega, descarga [YourWallet-Publicar.zip](https://github.com/Chris50146/BilleteraClara/blob/main/YourWallet-Publicar.zip), descomprímelo y ejecuta el mismo comando desde la carpeta `YourWallet-Publicar`.
 
 ## Verificar
 

@@ -1,4 +1,4 @@
-# Billetera Clara: instrucciones para continuar el proyecto
+# YourWallet: instrucciones para continuar el proyecto
 
 ## Restricción principal del usuario
 
@@ -50,7 +50,7 @@ La aplicación es Swing de escritorio. En un entorno sin pantalla se puede compi
 ## Entrega y colaboración
 
 - Mantén actualizados los ejemplos y las decisiones en docs/ProyectoFinal.md si cambia el comportamiento.
-- Si cambian fuentes o documentos de entrega, actualiza BilleteraClara-Publicar.zip con los archivos correspondientes y verifica que coincidan. No incluyas cachés, credenciales, referencias de clase ni archivos del editor en ese paquete.
+- Si cambian fuentes o documentos de entrega, actualiza YourWallet-Publicar.zip con los archivos correspondientes y verifica que coincidan. No incluyas cachés, credenciales, referencias de clase ni archivos del editor en ese paquete.
 - El repositorio propio de trabajo es Chris50146/BilleteraClara. V4rNull/BilleteraClara es el repositorio original del compañero; no se tiene permiso de escritura allí.
 - No subas tokens, credenciales o configuración personal del equipo.
 - Comunica y documenta el trabajo en español.

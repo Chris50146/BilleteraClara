@@ -1,4 +1,4 @@
-# Guía de presentación de Billetera Clara
+# Guía de presentación de YourWallet
 
 **Integrantes:** Israel Vargas y Christian Campero.
 
@@ -52,4 +52,4 @@ En el entorno cloud preparado, añadir primero `/workspace/.local/bin` al PATH. 
 
 ## Archivos para entregar
 
-Entregar `BilleteraClara-Publicar.zip`, que contiene código, comprobaciones, configuración de compilación, README, documento del sistema y esta guía. El material del curso, credenciales, cachés y archivos del editor quedan fuera del paquete. La propuesta original se conserva como antecedente en el repositorio; las decisiones vigentes están explicadas en el documento del sistema.
+Entregar `YourWallet-Publicar.zip`, que contiene código, comprobaciones, configuración de compilación, README, documento del sistema y esta guía. El material del curso, credenciales, cachés y archivos del editor quedan fuera del paquete. La propuesta original se conserva como antecedente en el repositorio; las decisiones vigentes están explicadas en el documento del sistema.

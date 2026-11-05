@@ -1,10 +1,10 @@
-# Billetera Clara - Proyecto final de Programación Funcional
+# YourWallet - Proyecto final de Programación Funcional
 
 **Integrantes:** Israel Vargas y Christian Campero.
 
 ## 1. Descripción del dominio
 
-Billetera Clara permite registrar y clasificar ingresos y gastos personales, consultar un saldo acumulado y comprobar una regla sencilla sobre el gasto en ocio. Está dirigido a personas que quieren entender sus movimientos diarios y evaluar una compra antes de realizarla.
+YourWallet permite registrar y clasificar ingresos y gastos personales, consultar un saldo acumulado y comprobar una regla sencilla sobre el gasto en ocio. Está dirigido a personas que quieren entender sus movimientos diarios y evaluar una compra antes de realizarla.
 
 Administra un usuario, sus transacciones, las fechas, los tipos de movimiento, las categorías y los resultados de auditoría y simulación. Toda la información permanece en memoria durante la sesión. El proyecto no incorpora cuentas bancarias, autenticación ni conexión a una base de datos.
 
@@ -51,6 +51,8 @@ Un usuario posee una billetera; la billetera contiene una lista inmutable de tra
 - Una operación rechazada devuelve `Error` y conserva la billetera original. La simulación nunca agrega una transacción.
 
 ## 5. Decisiones de diseño
+
+La aplicación se presenta como **YourWallet**. El paquete Scala interno `billeteraclara` y el repositorio `Chris50146/BilleteraClara` conservan sus identificadores; los comandos de ejecución siguen siendo los mismos. La propuesta original utiliza el nombre anterior como antecedente.
 
 ### Dinero exacto con tipos básicos
 
@@ -162,4 +164,4 @@ La primera ejecución puede descargar las herramientas de compilación. Las comp
 - README con instrucciones de ejecución y uso.
 - `docs/Presentacion.md`: guía de demostración y correspondencia con los requisitos obligatorios.
 - Configuración `build.sbt` y `project/build.properties` (infraestructura de compilación, separada del contenido del modelo).
-- Paquete `BilleteraClara-Publicar.zip` con los mismos fuentes y documentos, sin cachés ni archivos compilados.
+- Paquete `YourWallet-Publicar.zip` con los mismos fuentes y documentos, sin cachés ni archivos compilados.

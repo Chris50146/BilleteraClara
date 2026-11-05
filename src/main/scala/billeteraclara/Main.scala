@@ -161,7 +161,7 @@ private class Burbuja(texto: String, fondo: Color) extends JLabel(texto, SwingCo
     g2.dispose()
     super.paintComponent(g)
 
-private class VentanaBilletera extends JFrame("Billetera Clara"):
+private class VentanaBilletera extends JFrame("YourWallet"):
   import Estilo.*
 
   // La referencia al estado del dominio y las animaciones pertenecen a la interfaz.
@@ -247,7 +247,7 @@ private class VentanaBilletera extends JFrame("Billetera Clara"):
     val marcaTexto = new JPanel()
     marcaTexto.setOpaque(false)
     marcaTexto.setLayout(new BoxLayout(marcaTexto, BoxLayout.Y_AXIS))
-    marcaTexto.add(etiqueta("BILLETERA CLARA", 16, blanco, true))
+    marcaTexto.add(etiqueta("YourWallet", 16, blanco, true))
     marcaTexto.add(etiqueta("Tus finanzas, más simples", 11, new Color(216, 216, 255)))
     marca.add(marcaTexto)
     izquierda.add(marca)
